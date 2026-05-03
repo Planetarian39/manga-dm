@@ -41,7 +41,7 @@ dependencies = [
 sklearn = ["scikit-learn>=1.3"]
 
 [project.scripts]
-manga = "manga.cli.main:main"
+manga = "src.cli.main:main"
 
 [tool.setuptools.packages.find]
-include = ["manga*"]
+include = ["src*"]

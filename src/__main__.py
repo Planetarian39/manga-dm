@@ -1,9 +1,9 @@
-"""Entry point for ``python -m manga``.
+"""Entry point for ``python -m src``.
 
-Dispatches to the unified CLI in ``manga.cli.main``.
+Dispatches to the unified CLI in ``src.cli.main``.
 """
 
-from manga.cli.main import main
+from src.cli.main import main
 
 if __name__ == "__main__":
     main()
