@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=75.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "manga-dm"
+version = "0.1.0"
+description = "MaNGA Dark Matter analysis pipeline"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.11"
+authors = [
+    {name = "Developer"}
+]
+keywords = ["astronomy", "dark-matter", "manga", "nfw", "pymc"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Astronomy",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.10",
+    "matplotlib>=3.7",
+    "astropy>=5.0",
+    "pandas>=1.5",
+    "xarray>=2023.1",
+    "pymc>=5.0",
+    "arviz>=0.17",
+    "lmfit>=1.2",
+    "tqdm>=4.64",
+    "requests>=2.28",
+]
+
+[project.optional-dependencies]
+sklearn = ["scikit-learn>=1.3"]
+
+[project.scripts]
+manga = "manga.cli.main:main"
+
+[tool.setuptools.packages.find]
+include = ["manga*"]
