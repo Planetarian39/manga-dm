@@ -109,30 +109,72 @@ def main(argv: list[str] | None = None) -> None:
         _run_sample(args)
 
 
-# ── Stub dispatchers (replaced in later Waves) ──────────────────────────
-
-def _run_select(args):
-    print("Not yet implemented: manga select")
+# ── Dispatchers ─────────────────────────────────────────────────────
 
 
-def _run_stage1(args):
-    print("Not yet implemented: manga stage1")
+def _run_select(args) -> None:
+    from src.pipeline.selection import select_and_download
+
+    select_and_download(
+        ifu_file=args.ifu_file,
+        download=args.download,
+    )
 
 
-def _run_stage2(args):
-    print("Not yet implemented: manga stage2")
+def _run_stage1(args) -> None:
+    from src.pipeline.stage1 import run_stage1
+
+    run_stage1(
+        ifu=args.ifu,
+        nfw=args.nfw,
+        n_cores=args.n_cores,
+    )
 
 
-def _run_figures(args):
-    print("Not yet implemented: manga figures")
+def _run_stage2(args) -> None:
+    from src.pipeline.stage2 import run_stage2
+
+    run_stage2(
+        fit=args.fit,
+        quality_cut=args.quality_cut,
+        diagnose=args.diagnose,
+    )
 
 
-def _run_merge(args):
-    print("Not yet implemented: manga merge")
+def _run_figures(args) -> None:
+    if args.ifu is None:
+        print("Specify at least one plate-ifu with --ifu.")
+        return
+    # Delegate to legacy figure.py
+    import sys
+    from pathlib import Path as _Path
+    _old_root = _Path(__file__).resolve().parent.parent.parent / "src-orig"
+    if str(_old_root) not in sys.path:
+        sys.path.insert(0, str(_old_root))
+    # Argv hack: figure.py expects sys.argv
+    old_argv = sys.argv[:]
+    try:
+        sys.argv = ["figure.py"] + args.ifu
+        import figure
+        figure.main()
+    finally:
+        sys.argv = old_argv
 
 
-def _run_sample(args):
-    print("Not yet implemented: manga sample")
+def _run_merge(args) -> None:
+    from src.pipeline.stage2 import merge_samples
+
+    merge_samples(
+        ifu_file=args.ifu_file,
+    )
+
+
+def _run_sample(args) -> None:
+    from src.pipeline.selection import generate_robustness_sample
+
+    generate_robustness_sample(
+        n=args.n,
+    )
 
 
 if __name__ == "__main__":
