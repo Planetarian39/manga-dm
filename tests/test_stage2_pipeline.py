@@ -113,6 +113,50 @@ class Stage2PipelineTests(unittest.TestCase):
             ],
         )
 
+    def test_run_stage2_diagnose_uses_current_population_diagnostics(self) -> None:
+        calls: list[dict[str, object]] = []
+
+        fake_results = types.ModuleType("src.data.results")
+        fake_results.merge_posterior_samples_file = lambda *args, **kwargs: None
+        self._install_module("src.data.results", fake_results)
+
+        fake_population = types.ModuleType("src.models.population")
+
+        def fake_run_m200_c_psis_diagnostics(**kwargs):
+            calls.append(kwargs)
+            return {"n_bad_k": 0}
+
+        fake_population.run_m200_c_psis_diagnostics = fake_run_m200_c_psis_diagnostics
+        self._install_module("src.models.population", fake_population)
+
+        fake_m200 = types.ModuleType("m200")
+
+        def legacy_diagnose_called(*args, **kwargs):
+            raise AssertionError("legacy m200 diagnostics should not be called")
+
+        fake_m200.compute_psis_importance_diagnostics = legacy_diagnose_called
+        self._install_module("m200", fake_m200)
+        sys.modules.pop("src.pipeline.stage2", None)
+
+        stage2 = importlib.import_module("src.pipeline.stage2")
+        with tempfile.TemporaryDirectory() as tmp:
+            with redirect_stdout(StringIO()):
+                stage2.run_stage2(
+                    diagnose=True,
+                    quality_cut="strict",
+                    result_dir_override=tmp,
+                )
+
+        self.assertEqual(
+            calls,
+            [
+                {
+                    "quality_cut": "strict",
+                    "result_dir_override": Path(tmp),
+                }
+            ],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -117,7 +117,7 @@ manga-dm/
 |------|---------|------|--------|
 | 运行期委托历史脚本 | `src.pipeline.*`、`src.viz.*` 仍通过 `sys.path` import `src-orig` | 新架构边界不稳定，打包后行为依赖源码布局 | 高 |
 | CLI 参数未完全贯通 | 顶层参数 `--config`、`--data-dir`、`--result-dir`、`--verbose` 已解析但未统一初始化 settings | 用户传参可能无效或表现不一致 | 高 |
-| Stage 2 诊断未接线 | `--diagnose` 打印未接线提示 | CLI 功能表面存在，实际不可用 | 中 |
+| Stage 2 诊断输入依赖 | `--diagnose` 已接线到当前 PSIS 诊断，但依赖 `stage2 --fit` 保存的 `m200_c_fit_results.json` 和样本输入 | 缺少前置 fit 或样本时需要清晰报错 | 中 |
 | 可视化层多处 wrapper | `src.viz.*` 仍委托 `src-orig/figure.py` 或 `src-orig/m200.py` | 图生成难以单独验证和维护 | 中 |
 | 模型与 pipeline 归属不完全一致 | `src.models.population` 中仍包含部分 catalog、selection、plotting、pipeline 逻辑 | 层级边界被污染 | 中 |
 | 验证基线缺失 | 缺少固定的新旧路径对比脚本或最小 smoke test 清单 | 难以证明“重构无行为回归” | 高 |

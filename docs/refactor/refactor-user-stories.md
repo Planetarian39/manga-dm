@@ -166,9 +166,9 @@
 
 **验收标准：**
 
-- [ ] `--diagnose` 不再打印“not yet wired”。
-- [ ] 诊断逻辑调用 `src.stats.psis.compute_psis_importance_diagnostics`。
-- [ ] 缺少必要输入文件时给出清晰错误。
+- [x] `--diagnose` 不再打印“not yet wired”。
+- [x] 诊断逻辑调用 `src.stats.psis.compute_psis_importance_diagnostics`。
+- [x] 缺少必要输入文件时给出清晰错误。
 
 ### US-2.4 — selection 直接调用新模块
 

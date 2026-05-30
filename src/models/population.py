@@ -9,6 +9,7 @@ The PyMC model code in ``fit_m200_c_mcmc`` is **preserved verbatim**.
 
 from __future__ import annotations
 
+import json
 import os
 from pathlib import Path
 
@@ -66,6 +67,7 @@ HDI_PROB1 = settings.HDI_PROB1
 HDI_PROB2 = settings.HDI_PROB2
 NFW_PARAM_CM200_FILENAME = settings.nfw_param_cm200_filename
 NFW_PARAM_CM200_SAMPLE_FILENAME = settings.nfw_param_cm200_sample_filename
+M200_C_FIT_RESULTS_FILENAME = "m200_c_fit_results.json"
 
 root_dir = settings.root_dir
 data_dir = settings.data_dir
@@ -94,6 +96,44 @@ def _resolve_result_dir(result_dir_override: str | Path | None = None) -> Path:
 
 def _set_result_dir(result_dir_override: str | Path | None = None) -> Path:
     return _sync_settings_paths(result_dir_override, create=True)
+
+
+def _json_scalar_results(fit_results: dict) -> dict:
+    scalar_results = {}
+    for key, value in fit_results.items():
+        if isinstance(value, (str, int, float, bool)) or value is None:
+            scalar_results[key] = value
+            continue
+        if isinstance(value, np.generic):
+            scalar_results[key] = value.item()
+    return scalar_results
+
+
+def save_m200_c_fit_results(
+    fit_results: dict,
+    result_dir_override: str | Path | None = None,
+    filename: str = M200_C_FIT_RESULTS_FILENAME,
+) -> Path:
+    """Persist scalar population-fit results for later diagnostics."""
+    active_result_dir = _set_result_dir(result_dir_override)
+    output_path = active_result_dir / filename
+    with open(output_path, "w", encoding="utf-8") as handle:
+        json.dump(_json_scalar_results(fit_results), handle, indent=2, sort_keys=True)
+    return output_path
+
+
+def load_m200_c_fit_results(
+    result_dir_override: str | Path | None = None,
+    filename: str = M200_C_FIT_RESULTS_FILENAME,
+) -> dict:
+    """Load persisted scalar population-fit results."""
+    result_path = _resolve_result_dir(result_dir_override) / filename
+    if not result_path.exists():
+        raise FileNotFoundError(
+            f"population fit results not found: {result_path}. Run 'manga stage2 --fit' first."
+        )
+    with open(result_path, "r", encoding="utf-8") as handle:
+        return json.load(handle)
 
 
 def log10_c_m200_relation_profile(
@@ -1294,7 +1334,7 @@ def fit_m200_c_population(
 
     print("\n# 1. Fitting All Data")
     print("\nUsing MCMC for fitting...")
-    return fit_m200_c_mcmc(
+    fit_results = fit_m200_c_mcmc(
         M200,
         c,
         log10_M200_posterior_samples=sample_m200,
@@ -1311,6 +1351,69 @@ def fit_m200_c_population(
         sample_cap=sample_cap,
         dataset_label=dataset_label,
     )
+    if fit_results:
+        save_m200_c_fit_results(fit_results, result_dir_override=result_dir_override)
+    return fit_results
+
+
+def run_m200_c_psis_diagnostics(
+    *,
+    quality_cut: str | None = "recommended",
+    result_dir_override: str | Path | None = None,
+    ifu_ids: list[str] | None = None,
+    sample_cap: int | None = None,
+) -> dict | None:
+    """Run PSIS diagnostics using saved population-fit results."""
+    fit_results = load_m200_c_fit_results(result_dir_override=result_dir_override)
+    data = get_m200_c_data(
+        result_dir_override=result_dir_override,
+        ifu_ids=ifu_ids,
+        quality_cut=quality_cut,
+    )
+    if not data:
+        raise FileNotFoundError("No Stage 2 data available for PSIS diagnostics.")
+
+    required = (
+        "log10_M200_posterior_samples",
+        "log10_c_posterior_samples",
+        "log10_M200_prior_mu",
+        "log10_M200_prior_sigma",
+        "log10_M200_prior_lower",
+        "log10_M200_prior_upper",
+        "log10_c_prior_mu",
+        "log10_c_prior_sigma",
+    )
+    missing = [key for key in required if data.get(key) is None]
+    if missing:
+        raise ValueError(
+            "PSIS diagnostics require saved posterior samples and prior parameters; "
+            f"missing: {', '.join(missing)}"
+        )
+
+    diagnostics = compute_psis_importance_diagnostics(
+        log10_M200_posterior_samples=data["log10_M200_posterior_samples"],
+        log10_c_posterior_samples=data["log10_c_posterior_samples"],
+        log10_M200_prior_mu=data["log10_M200_prior_mu"],
+        log10_M200_prior_sigma=data["log10_M200_prior_sigma"],
+        log10_M200_prior_lower=data["log10_M200_prior_lower"],
+        log10_M200_prior_upper=data["log10_M200_prior_upper"],
+        log10_c_prior_mu=data["log10_c_prior_mu"],
+        log10_c_prior_sigma=data["log10_c_prior_sigma"],
+        fit_results=fit_results,
+        plot_suffix="_all",
+        sample_cap=sample_cap,
+    )
+    if diagnostics is None:
+        raise ValueError(
+            "PSIS diagnostics could not be computed. Ensure the saved population fit used posterior samples."
+        )
+
+    print(
+        "PSIS diagnostics complete: "
+        f"bad k={diagnostics.get('n_bad_k', 0)}, "
+        f"warning k={diagnostics.get('n_warn_k', 0)}"
+    )
+    return diagnostics
 
 
 def fit_m200_c_mcmc(

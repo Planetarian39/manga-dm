@@ -43,9 +43,13 @@ def run_stage2(
             result_dir_override=result_dir,
         )
     elif diagnose:
+        from src.models.population import run_m200_c_psis_diagnostics
+
         print("Running PSIS diagnostics...")
-        # _m200.compute_psis_importance_diagnostics(...)
-        print("PSIS diagnostics not yet wired — use legacy m200.py directly.")
+        run_m200_c_psis_diagnostics(
+            quality_cut=quality_cut,
+            result_dir_override=result_dir,
+        )
     else:
         print("No action specified for Stage 2. Use --fit or --diagnose.")
 
