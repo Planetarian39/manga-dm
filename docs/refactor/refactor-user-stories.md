@@ -299,9 +299,9 @@
 
 **验收标准：**
 
-- [ ] README 说明 `src-orig` 仅用于兼容旧调用。
-- [ ] AGENTS 或重构文档说明新功能必须进入 `src`。
-- [ ] `src-orig` 不被当前 `src` 运行期路径依赖，或仅剩明确批准的兼容点。
+- [x] README 说明 `src-orig` 仅用于兼容旧调用。
+- [x] AGENTS 或重构文档说明新功能必须进入 `src`。
+- [x] `src-orig` 不被当前 `src` 运行期路径依赖，或仅剩明确批准的兼容点。
 
 ### US-5.2 — 同步 README 命令示例
 
@@ -311,9 +311,9 @@
 
 **验收标准：**
 
-- [ ] README 包含 `python -m src` 和 `manga --help`。
-- [ ] README 示例覆盖 `select`、`stage1`、`stage2`、`figures`、`merge`、`sample`。
-- [ ] README 明确数据缺失时哪些 smoke test 仍可运行。
+- [x] README 包含 `python -m src` 和 `manga --help`。
+- [x] README 示例覆盖 `select`、`stage1`、`stage2`、`figures`、`merge`、`sample`。
+- [x] README 明确数据缺失时哪些 smoke test 仍可运行。
 
 ### US-5.3 — 最终依赖扫描
 
