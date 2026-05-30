@@ -94,5 +94,6 @@ tmpclaude*
 *.blg
 *.bbl
 docs/latex/*.pdf
-docs
+docs/refactor
+
 
