@@ -48,6 +48,7 @@ from src.stats.intervals import (
     format_pair_interval_title,
 )
 from src.stats.gmm import fit_log10_mc_gmm
+from src.viz.posterior import annotate_pair_marginals
 
 # ── ArviZ compat ────────────────────────────────────────────────────
 az = ensure_arviz_compat()
@@ -77,6 +78,7 @@ _calc_interval_overlap_mask = calc_interval_overlap_mask
 _get_interval_value_formatter = get_interval_value_formatter
 _format_pair_interval_title = format_pair_interval_title
 _fit_log10_mc_gmm = fit_log10_mc_gmm
+_annotate_pair_marginals = annotate_pair_marginals
 class DmNfw:
     drpall_util: DrpallUtil
     PLATE_IFU: str

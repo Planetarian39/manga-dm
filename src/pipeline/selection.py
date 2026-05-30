@@ -5,9 +5,12 @@ Consolidated from ``src-orig/plates.py`` and ``src-orig/m200.py``.
 
 from __future__ import annotations
 
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-from src.config.constants import TEST_PLATE_IFUS, PLATES_FILENAME
+from tqdm import tqdm
+
+from src.config.constants import PLATES_FILENAME
 from src.config.settings import settings
 
 
@@ -38,15 +41,76 @@ def select_and_download(
     if inc_max is None:
         inc_max = settings.INC_MAX
 
-    # Use legacy implementation via sys.path hook
-    from pathlib import Path as _Path
-    import sys as _sys
-    _old_root = _Path(__file__).resolve().parent.parent.parent / "src-orig"
-    if str(_old_root) not in _sys.path:
-        _sys.path.insert(0, str(_old_root))
+    from src.data.catalog import DrpallUtil
+    from src.data.fits import FitsUtil
 
-    import plates as _plates
-    return _plates.main()
+    fits_util = FitsUtil(settings.data_dir)
+    drpall_file = fits_util.get_drpall_file()
+    print(f"DRPALL file: {drpall_file}")
+
+    drpall_util = DrpallUtil(drpall_file)
+    plateifus, _ = drpall_util.search_plateifu_by_inc(inc_min, inc_max)
+    selected = sorted(str(plateifu) for plateifu in plateifus)
+
+    print(f"-- Galaxies with inclination between {inc_min} and {inc_max} degrees:")
+    print(f"  Total found: {len(selected)}")
+    print("== Filter selection of galaxies:")
+    print(f"  Total selected galaxies: {len(selected)}")
+
+    output_file = (
+        settings.resolve_input_path(ifu_file)
+        if ifu_file is not None
+        else settings.data_dir / PLATES_FILENAME
+    )
+    output_file.parent.mkdir(parents=True, exist_ok=True)
+    with open(output_file, "w", encoding="utf-8") as fh:
+        for plateifu in selected:
+            fh.write(f"{plateifu}\n")
+    print(f"  Selected plateifus saved to: {output_file}")
+
+    if download:
+        _download_selected_fits(fits_util, selected)
+
+    return selected
+
+
+def _download_selected_fits(fits_util, plateifu_list: list[str]) -> None:
+    total = len(plateifu_list)
+    if total == 0:
+        print("No plateifu to download.")
+        return
+
+    max_workers = min(8, total)
+
+    def _process(plateifu: str):
+        errors = []
+        try:
+            fits_util.get_maps_file(plateifu, checksum=True)
+        except Exception as exc:
+            errors.append(f"maps:{exc}")
+
+        try:
+            fits_util.get_image_file(plateifu)
+        except Exception as exc:
+            errors.append(f"image:{exc}")
+
+        return plateifu, errors
+
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = {executor.submit(_process, plateifu): plateifu for plateifu in plateifu_list}
+        for future in tqdm(
+            as_completed(futures),
+            total=total,
+            desc="Downloading maps",
+            unit="galaxy",
+        ):
+            try:
+                plateifu, errors = future.result()
+                if errors:
+                    tqdm.write(f"Errors for {plateifu}: {', '.join(errors)}")
+            except Exception as exc:
+                plateifu = futures.get(future, "unknown")
+                tqdm.write(f"Unhandled error for {plateifu}: {exc}")
 
 
 def generate_robustness_sample(
@@ -55,18 +119,11 @@ def generate_robustness_sample(
 ) -> None:
     """Generate *n* robustness sub-samples from the posterior pool.
 
-    Delegates to the legacy ``m200.py`` implementation.
+    Delegates to the current population-model helper.  Additional CLI options
+    will be wired in a later pass; this preserves the existing public surface.
     """
-    from pathlib import Path as _Path
-    import sys as _sys
-    _old_root = _Path(__file__).resolve().parent.parent.parent / "src-orig"
-    if str(_old_root) not in _sys.path:
-        _sys.path.insert(0, str(_old_root))
-    import m200 as _m200
-
-    result_dir = settings.resolve_result_dir(result_dir_override)
-    _m200._set_result_dir(result_dir)
+    from src.models.population import generate_robustness_sample as _generate
 
     print(f"Generating {n} robustness sub-samples...")
-    _m200.generate_robustness_sample()
+    _generate(n_sample=n, result_dir_override=result_dir_override)
     print("Done.")

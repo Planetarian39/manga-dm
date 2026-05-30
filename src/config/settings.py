@@ -15,12 +15,10 @@ The configuration file (``config.toml``) is searched in the following order:
 
 from __future__ import annotations
 
-import functools
 import tomllib
 from pathlib import Path
-from typing import Any
 
-__all__ = ["Settings", "settings"]
+__all__ = ["Settings", "init_settings", "settings"]
 
 
 def _find_project_root() -> Path:
@@ -54,10 +52,9 @@ class Settings:
         settings.data_dir / "analysis"
     """
 
-    _initialised: bool = False
-
     # ── Project root ────────────────────────────────────────────────────
     _root_dir: Path | None = None
+    _result_dir_override: str | Path | None = None
 
     @property
     def root_dir(self) -> Path:
@@ -106,16 +103,44 @@ class Settings:
         # True singleton: always return the same instance
         if not hasattr(cls, "_instance"):
             cls._instance = super().__new__(cls)
+            cls._instance._initialised = False
             cls._instance._init_from_toml()
         return cls._instance
 
-    def _init_from_toml(self, config_path: str | Path | None = None) -> None:
+    def configure(
+        self,
+        config_path: str | Path | None = None,
+        *,
+        data_dir: str | Path | None = None,
+        result_dir: str | Path | None = None,
+        root_dir: str | Path | None = None,
+    ) -> "Settings":
+        """Reload settings and apply CLI-style directory overrides."""
+        self._initialised = False
+        if root_dir is not None:
+            self.root_dir = root_dir
+        self._init_from_toml(
+            config_path=config_path,
+            data_dir=data_dir,
+            result_dir=result_dir,
+        )
+        return self
+
+    def _init_from_toml(
+        self,
+        config_path: str | Path | None = None,
+        *,
+        data_dir: str | Path | None = None,
+        result_dir: str | Path | None = None,
+    ) -> None:
         if self._initialised:
             return
 
         # Resolve config file
         if config_path is not None:
             path = Path(config_path)
+            if not path.exists():
+                raise FileNotFoundError(f"config file not found: {path}")
         else:
             path = Path("config.toml")
             if not path.exists():
@@ -135,6 +160,7 @@ class Settings:
         # ── file section ────────────────────────────────────────────
         self.data_directory = file_cfg.get("data_directory", "data")
         self.result_directory = file_cfg.get("result_directory", "results")
+        self._result_dir_override = None
         self.rc_param_filename = file_cfg.get(
             "rc_param_filename", "rc_param.csv"
         )
@@ -194,26 +220,36 @@ class Settings:
         self.BA_0 = float(rc_cfg.get("BA_0", 0.2))
         self.VEL_SYSTEM_ERROR = float(rc_cfg.get("VEL_SYSTEM_ERROR", 5.0))
 
+        if data_dir is not None:
+            self.data_directory = str(data_dir)
+        if result_dir is not None:
+            self._result_dir_override = result_dir
+
         self._initialised = True
 
     # ── Derived paths ───────────────────────────────────────────────────
 
+    def _resolve_root_relative_path(self, value: str | Path) -> Path:
+        path = Path(value)
+        if not path.is_absolute():
+            path = self.root_dir / path
+        return path
+
     @property
     def data_dir(self) -> Path:
-        return self.root_dir / self.data_directory
+        return self._resolve_root_relative_path(self.data_directory)
 
     @property
     def result_dir(self) -> Path:
+        if self._result_dir_override is not None:
+            return self._resolve_root_relative_path(self._result_dir_override)
         return self.data_dir / self.result_directory
 
     def resolve_result_dir(self, override: str | Path | None = None) -> Path:
         """Return ``result_dir``, optionally overridden by a CLI argument."""
         if override is None:
             return self.result_dir
-        resolved = Path(override)
-        if not resolved.is_absolute():
-            resolved = self.root_dir / resolved
-        return resolved
+        return self._resolve_root_relative_path(override)
 
     def resolve_input_path(self, path_like: str | Path) -> Path:
         """Resolve an input path: if relative, make it absolute w.r.t. root."""
@@ -243,3 +279,23 @@ class Settings:
 
 # Module-level singleton — import this everywhere
 settings = Settings()
+
+
+def init_settings(
+    config_path: str | Path | None = None,
+    *,
+    data_dir: str | Path | None = None,
+    result_dir: str | Path | None = None,
+    root_dir: str | Path | None = None,
+) -> Settings:
+    """Reload the module-level settings singleton.
+
+    The singleton object is mutated in place so modules that imported
+    ``settings`` keep seeing the current configuration.
+    """
+    return settings.configure(
+        config_path=config_path,
+        data_dir=data_dir,
+        result_dir=result_dir,
+        root_dir=root_dir,
+    )

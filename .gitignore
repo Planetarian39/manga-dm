@@ -75,6 +75,9 @@ env/
 # VS Code
 .vscode/
 
+# local git worktrees
+.worktrees/
+
 # data files
 /data
 
@@ -95,5 +98,4 @@ tmpclaude*
 *.bbl
 docs/latex/*.pdf
 docs/refactor
-
 

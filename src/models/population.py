@@ -55,8 +55,10 @@ from src.stats.psis import (
     is_ess_from_log_weights as _is_ess_from_log_weights,
     compute_psis_importance_diagnostics,
 )
+from src.viz.posterior import annotate_pair_marginals_m200
 
 az = get_az()
+_annotate_pair_marginals_m200 = annotate_pair_marginals_m200
 
 # ── Config / constant shims ──────────────────────────────────────────
 H_0 = H_ACTUAL  # the old code uses H_0
@@ -64,6 +66,36 @@ HDI_PROB1 = settings.HDI_PROB1
 HDI_PROB2 = settings.HDI_PROB2
 NFW_PARAM_CM200_FILENAME = settings.nfw_param_cm200_filename
 NFW_PARAM_CM200_SAMPLE_FILENAME = settings.nfw_param_cm200_sample_filename
+
+root_dir = settings.root_dir
+data_dir = settings.data_dir
+result_dir = settings.result_dir
+
+
+def _sync_settings_paths(
+    result_dir_override: str | Path | None = None,
+    *,
+    create: bool = False,
+) -> Path:
+    """Refresh legacy-style path globals from the current settings object."""
+    global root_dir, data_dir, result_dir
+
+    root_dir = settings.root_dir
+    data_dir = settings.data_dir
+    result_dir = settings.resolve_result_dir(result_dir_override)
+    if create:
+        result_dir.mkdir(parents=True, exist_ok=True)
+    return result_dir
+
+
+def _resolve_result_dir(result_dir_override: str | Path | None = None) -> Path:
+    return settings.resolve_result_dir(result_dir_override)
+
+
+def _set_result_dir(result_dir_override: str | Path | None = None) -> Path:
+    return _sync_settings_paths(result_dir_override, create=True)
+
+
 def log10_c_m200_relation_profile(
     M200: np.ndarray, log10_c0: float, alpha: float, h: float = H_0
 ) -> np.ndarray:
@@ -1220,6 +1252,67 @@ def _compute_linear_fit(
     return coeffs[1], coeffs[0]
 
 
+def fit_m200_c_population(
+    *,
+    quality_cut: str | None = "recommended",
+    result_dir_override: str | Path | None = None,
+    ifu_ids: list[str] | None = None,
+    use_gmm: bool = True,
+    use_samples: bool = False,
+    sample_cap: int | None = None,
+    dataset_label: str = "all",
+):
+    """Load Stage 2 data and run the current population c-M200 fit."""
+    _set_result_dir(result_dir_override)
+    data = get_m200_c_data(
+        result_dir_override=result_dir_override,
+        ifu_ids=ifu_ids,
+        quality_cut=quality_cut,
+    )
+    if not data:
+        print("Failed to load data. Exiting.")
+        return None
+
+    M200 = data.get("M200")
+    c = data.get("c")
+    if M200 is None or c is None:
+        print("M200/c columns are missing from the Stage 2 input table. Exiting.")
+        return None
+
+    sample_m200 = data.get("log10_M200_posterior_samples") if use_samples else None
+    sample_c = data.get("log10_c_posterior_samples") if use_samples else None
+    sample_m200_prior_mu = data.get("log10_M200_prior_mu") if use_samples else None
+    sample_m200_prior_sigma = data.get("log10_M200_prior_sigma") if use_samples else None
+    sample_m200_prior_lower = data.get("log10_M200_prior_lower") if use_samples else None
+    sample_m200_prior_upper = data.get("log10_M200_prior_upper") if use_samples else None
+    sample_c_prior_mu = data.get("log10_c_prior_mu") if use_samples else None
+    sample_c_prior_sigma = data.get("log10_c_prior_sigma") if use_samples else None
+
+    log10_gmm_weights = data.get("log10_gmm_weights") if use_gmm else None
+    log10_gmm_means = data.get("log10_gmm_means") if use_gmm else None
+    log10_gmm_covariances = data.get("log10_gmm_covariances") if use_gmm else None
+
+    print("\n# 1. Fitting All Data")
+    print("\nUsing MCMC for fitting...")
+    return fit_m200_c_mcmc(
+        M200,
+        c,
+        log10_M200_posterior_samples=sample_m200,
+        log10_c_posterior_samples=sample_c,
+        log10_M200_prior_mu=sample_m200_prior_mu,
+        log10_M200_prior_sigma=sample_m200_prior_sigma,
+        log10_M200_prior_lower=sample_m200_prior_lower,
+        log10_M200_prior_upper=sample_m200_prior_upper,
+        log10_c_prior_mu=sample_c_prior_mu,
+        log10_c_prior_sigma=sample_c_prior_sigma,
+        log10_gmm_weights=log10_gmm_weights,
+        log10_gmm_means=log10_gmm_means,
+        log10_gmm_covariances=log10_gmm_covariances,
+        sample_cap=sample_cap,
+        dataset_label=dataset_label,
+    )
+
+
 def fit_m200_c_mcmc(
     M200_obs: np.ndarray,
     c_obs: np.ndarray,
@@ -1801,5 +1894,3 @@ def fit_m200_c_mcmc(
         "dataset_label": dataset_label,
         "loo": loo,
     }
-
-

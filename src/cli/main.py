@@ -97,6 +97,17 @@ def main(argv: list[str] | None = None) -> None:
     # Parse
     args = parser.parse_args(argv)
 
+    try:
+        from src.config.settings import init_settings
+
+        init_settings(
+            config_path=args.config,
+            data_dir=args.data_dir,
+            result_dir=args.result_dir,
+        )
+    except FileNotFoundError as exc:
+        parser.error(str(exc))
+
     if args.subcommand is None:
         parser.print_help()
         return
@@ -135,6 +146,7 @@ def _run_stage1(args) -> None:
         ifu=args.ifu,
         nfw=args.nfw,
         n_cores=args.n_cores,
+        result_dir_override=args.result_dir,
     )
 
 
@@ -145,6 +157,7 @@ def _run_stage2(args) -> None:
         fit=args.fit,
         quality_cut=args.quality_cut,
         diagnose=args.diagnose,
+        result_dir_override=args.result_dir,
     )
 
 
@@ -152,20 +165,69 @@ def _run_figures(args) -> None:
     if args.ifu is None:
         print("Specify at least one plate-ifu with --ifu.")
         return
-    # Delegate to legacy figure.py
-    import sys
-    from pathlib import Path as _Path
-    _old_root = _Path(__file__).resolve().parent.parent.parent / "src-orig"
-    if str(_old_root) not in sys.path:
-        sys.path.insert(0, str(_old_root))
-    # Argv hack: figure.py expects sys.argv
-    old_argv = sys.argv[:]
-    try:
-        sys.argv = ["figure.py"] + args.ifu
-        import figure
-        figure.main()
-    finally:
-        sys.argv = old_argv
+    from pathlib import Path
+
+    from src.viz.paper import (
+        plot_m200_c_summary_comparison,
+        plot_m200_c_summary_panels,
+    )
+    from src.viz.rc_curves import (
+        plot_rc_fit_summary_comparison,
+        plot_rc_fit_summary_panels,
+    )
+    from src.viz.velocity_maps import (
+        plot_velocity_field_comparison,
+        plot_velocity_field_panels,
+    )
+
+    output_dir = (
+        Path(args.output_dir)
+        if args.output_dir is not None
+        else args.result_dir
+    )
+    if output_dir is None:
+        from src.config.settings import settings
+
+        output_dir = settings.result_dir
+    else:
+        output_dir = Path(output_dir)
+
+    velocity_output = output_dir / "velocity_field_comparison.png"
+    posterior_output = output_dir / "m200_c_comparison.png"
+    rcfit_output = output_dir / "rc_fit_summary_comparison.png"
+
+    plateifus = list(args.ifu)
+    plot_path = plot_velocity_field_comparison(
+        plateifus=plateifus,
+        output_path=velocity_output,
+    )
+    posterior_plot_path = plot_m200_c_summary_comparison(
+        plateifus=plateifus,
+        output_path=posterior_output,
+    )
+    posterior_panel_paths = plot_m200_c_summary_panels(
+        plateifus=plateifus,
+        output_path=posterior_output,
+    )
+    rcfit_plot_path = plot_rc_fit_summary_comparison(
+        plateifus=plateifus,
+        output_path=rcfit_output,
+    )
+    rcfit_panel_paths = plot_rc_fit_summary_panels(
+        plateifus=plateifus,
+        output_path=rcfit_output,
+    )
+    velocity_panel_paths = plot_velocity_field_panels(
+        plateifus=plateifus,
+        output_path=velocity_output,
+    )
+
+    print(f"Velocity-field figure saved to {plot_path}")
+    print(f"M200/c summary figure saved to {posterior_plot_path}")
+    print(f"M200/c panel figures saved to {posterior_panel_paths}")
+    print(f"RC-fit summary figure saved to {rcfit_plot_path}")
+    print(f"RC-fit panel figures saved to {rcfit_panel_paths}")
+    print(f"Velocity-field panel figures saved to {velocity_panel_paths}")
 
 
 def _run_merge(args) -> None:
@@ -173,6 +235,7 @@ def _run_merge(args) -> None:
 
     merge_samples(
         ifu_file=args.ifu_file,
+        result_dir_override=args.result_dir,
     )
 
 
@@ -181,6 +244,7 @@ def _run_sample(args) -> None:
 
     generate_robustness_sample(
         n=args.n,
+        result_dir_override=args.result_dir,
     )
 
 
