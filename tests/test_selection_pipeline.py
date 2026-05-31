@@ -11,6 +11,7 @@ from io import StringIO
 from src.config import settings as settings_module
 from pathlib import Path
 
+import src.pipeline.selection as selection
 from src.pipeline.selection import generate_robustness_sample, select_and_download
 
 
@@ -30,39 +31,10 @@ class SelectionPipelineTests(unittest.TestCase):
         else:
             sys.modules[name] = original
 
-    def test_generate_robustness_sample_uses_current_population_module(self) -> None:
-        calls: list[dict[str, object]] = []
-
-        fake_population = types.ModuleType("src.models.population")
-
-        def fake_generate_robustness_sample(**kwargs):
-            calls.append(kwargs)
-            return None
-
-        fake_population.generate_robustness_sample = fake_generate_robustness_sample
-        self._install_module("src.models.population", fake_population)
-
-        fake_m200 = types.ModuleType("m200")
-        fake_m200._set_result_dir = lambda *args, **kwargs: None
-
-        def legacy_generate_called(*args, **kwargs):
-            raise AssertionError("legacy m200 sample should not be called")
-
-        fake_m200.generate_robustness_sample = legacy_generate_called
-        self._install_module("m200", fake_m200)
-
-        with redirect_stdout(StringIO()):
-            generate_robustness_sample(n=7, result_dir_override="custom-results")
-
-        self.assertEqual(
-            calls,
-            [
-                {
-                    "n_sample": 7,
-                    "result_dir_override": "custom-results",
-                }
-            ],
-        )
+    def test_generate_robustness_sample_logic_lives_in_selection(self) -> None:
+        self.assertTrue(hasattr(selection, "_filter_dataframe_by_success"))
+        self.assertTrue(hasattr(selection, "_resolve_quality_filter_thresholds"))
+        self.assertEqual(generate_robustness_sample.__module__, "src.pipeline.selection")
 
     def test_select_and_download_uses_current_data_modules_not_legacy_plates(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

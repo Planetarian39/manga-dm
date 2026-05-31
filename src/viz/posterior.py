@@ -11,6 +11,7 @@ from scipy.stats import norm
 from src.config.constants import COLOR_DATA_POINTS, COLOR_HDI_BAND, COLOR_HIGH_N, COLOR_LOW_N
 from src.config.settings import settings
 from src.stats.intervals import format_pair_interval_title
+from src.viz.utils import plot_posterior_1d_hdi
 
 
 def _get_pair_plot_label(var_name: str) -> str:
@@ -109,6 +110,232 @@ def annotate_pair_marginals(
 def annotate_pair_marginals_m200(*args, **kwargs) -> None:
     """Population-model alias for pair-plot marginal annotations."""
     annotate_pair_marginals(*args, **kwargs)
+
+
+def _build_prior_posterior_density_data(
+    az_api,
+    posterior_samples: dict[str, np.ndarray],
+    prior_draw_count: int,
+) -> tuple[object, object]:
+    rng = np.random.default_rng(42)
+    prior_samples = {
+        "log10_c0": rng.normal(
+            loc=float(settings.LOG10_C0_PRIOR_MEAN),
+            scale=float(settings.LOG10_C0_PRIOR_SIGMA),
+            size=prior_draw_count,
+        )
+        if hasattr(settings, "LOG10_C0_PRIOR_MEAN")
+        else rng.normal(loc=0.9, scale=0.2, size=prior_draw_count),
+        "alpha": rng.normal(
+            loc=float(settings.ALPHA_PRIOR_MEAN),
+            scale=float(settings.ALPHA_PRIOR_SIGMA),
+            size=prior_draw_count,
+        )
+        if hasattr(settings, "ALPHA_PRIOR_MEAN")
+        else rng.normal(loc=-0.1, scale=0.15, size=prior_draw_count),
+    }
+    prior = az_api.from_dict(
+        posterior={key: value[None, :] for key, value in prior_samples.items()}
+    )
+    posterior = az_api.from_dict(
+        posterior={
+            key: np.asarray(value, dtype=float).reshape(1, -1)
+            for key, value in posterior_samples.items()
+        }
+    )
+    return prior, posterior
+
+
+def plot_population_posterior_diagnostics(
+    *,
+    trace,
+    posterior,
+    az_api,
+    log10_c0_samples: np.ndarray,
+    alpha_samples: np.ndarray,
+    dataset_label: str,
+    dataset_tag: str,
+    result_dir: str | Path,
+    hdi_prob1: float,
+    hdi_prob2: float,
+) -> None:
+    """Save population posterior density and pair diagnostic plots."""
+    result_dir = Path(result_dir)
+    try:
+        prior_draw_count = max(len(log10_c0_samples), len(alpha_samples), 1000)
+        prior_idata, posterior_idata = _build_prior_posterior_density_data(
+            az_api,
+            posterior_samples={
+                "log10_c0": np.asarray(log10_c0_samples, dtype=float),
+                "alpha": np.asarray(alpha_samples, dtype=float),
+            },
+            prior_draw_count=prior_draw_count,
+        )
+
+        def _save_single_density_plot(
+            var_name: str,
+            samples: np.ndarray,
+            title_prefix: str,
+            color: str,
+            *,
+            save_combined: bool = True,
+        ) -> None:
+            if save_combined:
+                fig, axes = plt.subplots(2, 1, figsize=(6.2, 7.0))
+                az_api.plot_density(
+                    [prior_idata, posterior_idata],
+                    data_labels=["Prior", "Posterior"],
+                    var_names=[var_name],
+                    ax=np.atleast_1d(axes[0]),
+                    point_estimate=None,
+                    hdi_prob=hdi_prob2,
+                    shade=0.15,
+                    colors=["#9A9A9A", color],
+                    outline=True,
+                    textsize=8,
+                )
+                axes[0].set_title(f"{title_prefix} Prior vs Posterior")
+                axes[0].set_xlabel(title_prefix)
+                plot_posterior_1d_hdi(
+                    samples,
+                    title=f"{title_prefix} Posterior KDE",
+                    base_color=color,
+                    ax=axes[1],
+                    hdi_probs=(hdi_prob1, hdi_prob2),
+                    show_interval_bars=False,
+                )
+                fig.tight_layout()
+                out = result_dir / f"c-M_relation_posterior_{dataset_tag}_{var_name}.png"
+                fig.savefig(out, dpi=300, bbox_inches="tight")
+                fig.savefig(out.with_suffix(".pdf"), format="pdf", bbox_inches="tight")
+                plt.close(fig)
+
+            density_fig, density_ax = plt.subplots(1, 1, figsize=(6.2, 3.2))
+            az_api.plot_density(
+                [prior_idata, posterior_idata],
+                data_labels=["Prior", "Posterior"],
+                var_names=[var_name],
+                ax=np.atleast_1d(density_ax),
+                point_estimate=None,
+                hdi_prob=hdi_prob2,
+                shade=0.15,
+                colors=["#9A9A9A", color],
+                outline=True,
+                textsize=8,
+            )
+            density_ax.set_title(f"{title_prefix} Prior vs Posterior")
+            density_ax.set_xlabel(title_prefix)
+            density_fig.tight_layout()
+            density_out = result_dir / f"c-M_relation_posterior_{dataset_tag}_{var_name}_density.png"
+            density_fig.savefig(density_out, dpi=300, bbox_inches="tight")
+            density_fig.savefig(density_out.with_suffix(".pdf"), format="pdf", bbox_inches="tight")
+            plt.close(density_fig)
+
+            kde_fig, kde_ax = plt.subplots(1, 1, figsize=(6.2, 3.2))
+            plot_posterior_1d_hdi(
+                samples,
+                title=f"{title_prefix} Posterior KDE",
+                base_color=color,
+                ax=kde_ax,
+                hdi_probs=(hdi_prob1, hdi_prob2),
+                show_interval_bars=False,
+            )
+            kde_fig.tight_layout()
+            kde_out = result_dir / f"c-M_relation_posterior_{dataset_tag}_{var_name}_kde.png"
+            kde_fig.savefig(kde_out, dpi=300, bbox_inches="tight")
+            kde_fig.savefig(kde_out.with_suffix(".pdf"), format="pdf", bbox_inches="tight")
+            plt.close(kde_fig)
+
+        skip_combined_plot_vars = {"log10_c0", "alpha"} if dataset_tag == "all" else set()
+        _save_single_density_plot(
+            "log10_c0",
+            log10_c0_samples,
+            r"$\log_{10} c_0$",
+            COLOR_LOW_N,
+            save_combined="log10_c0" not in skip_combined_plot_vars,
+        )
+        _save_single_density_plot(
+            "alpha",
+            alpha_samples,
+            r"$\alpha$",
+            COLOR_HIGH_N,
+            save_combined="alpha" not in skip_combined_plot_vars,
+        )
+        print("Split prior/posterior and KDE plots saved for log10_c0 and alpha")
+    except Exception as exc:
+        print(f"Warning: Split prior/posterior and KDE plots failed: {exc}")
+
+    try:
+        pair_var_names_all = ["log10_c0", "alpha", "M200_mu", "M200_sigma", "sigma_int"]
+        pair_axes_all = az_api.plot_pair(
+            trace,
+            var_names=pair_var_names_all,
+            kind=["kde"],
+            marginals=True,
+            marginal_kwargs={
+                "kind": "hist",
+                "hist_kwargs": {
+                    "bins": 30,
+                    "histtype": "step",
+                    "linewidth": 1.5,
+                    "density": True,
+                },
+            },
+            kde_kwargs={"hdi_probs": [hdi_prob1, hdi_prob2]},
+            point_estimate=None,
+            textsize=8,
+            divergences=False,
+        )
+        annotate_pair_marginals_m200(
+            pair_axes_all,
+            posterior,
+            pair_var_names_all,
+            title_fontsize=9,
+            plot_median_line=True,
+        )
+        for var_name in pair_var_names_all:
+            pair_axes_single = az_api.plot_pair(
+                trace,
+                var_names=[var_name],
+                kind=["kde"],
+                marginals=True,
+                marginal_kwargs={
+                    "kind": "hist",
+                    "hist_kwargs": {
+                        "bins": 30,
+                        "histtype": "step",
+                        "linewidth": 1.5,
+                        "density": True,
+                    },
+                },
+                kde_kwargs={"hdi_probs": [hdi_prob1, hdi_prob2]},
+                point_estimate=None,
+                textsize=8,
+                divergences=False,
+            )
+            pair_axes_single_array = np.asarray(pair_axes_single, dtype=object)
+            fig = pair_axes_single_array.flat[0].figure
+            fig.set_size_inches(4.2, 4.2)
+            out = result_dir / f"c-M_relation_pair_{dataset_label}_{var_name}.png"
+            fig.savefig(out, dpi=300, bbox_inches="tight")
+            fig.savefig(out.with_suffix(".pdf"), format="pdf", bbox_inches="tight")
+            plt.close(fig)
+
+        pair_axes_all_array = np.asarray(pair_axes_all, dtype=object)
+        for ax in pair_axes_all_array.flat:
+            if ax is not None:
+                ax.set_xticks([])
+                ax.set_yticks([])
+
+        pair_all_fig = pair_axes_all_array.flat[0].figure
+        pair_all_fig.set_size_inches(12, 10)
+        pair_all_path = result_dir / f"c-M_relation_pair_{dataset_tag}.png"
+        pair_all_fig.savefig(pair_all_path, dpi=300, bbox_inches="tight")
+        pair_all_fig.savefig(pair_all_path.with_suffix(".pdf"), format="pdf", bbox_inches="tight")
+        plt.close(pair_all_fig)
+        print(f"All-parameter pair plot saved to {pair_all_path}")
+    except Exception as exc:
+        print(f"Warning: All-parameter pair plot failed: {exc}")
 
 
 def plot_population_inference_diagnostics(

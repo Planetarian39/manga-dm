@@ -11,10 +11,12 @@ from pathlib import Path
 from typing import Iterable, Optional
 
 import numpy as np
+import pandas as pd
 from astropy.io import fits
 from astropy.table import Table
 
 from src.config.constants import BIT_MASK_3_EXCLUDE, BIT_MASK_DRP_FAIL, TEST_PLATE_IFUS, PLATES_FILENAME  # noqa: F401
+from src.config.settings import settings
 
 log = logging.getLogger(__name__)
 if not log.handlers:
@@ -273,3 +275,154 @@ def get_plateifu_list(filepath: str | None = None, test: bool = False) -> list[s
         return list(TEST_PLATE_IFUS)
     with open(path, "r") as f:
         return [line.strip() for line in f if line.strip()]
+
+
+def _find_first_column_name(column_names, candidates: list[str]) -> str | None:
+    lower_to_actual = {str(name).lower(): str(name) for name in column_names}
+    for candidate in candidates:
+        matched = lower_to_actual.get(str(candidate).lower())
+        if matched is not None:
+            return matched
+    return None
+
+
+def _table_column_to_array(
+    table,
+    candidates: list[str],
+    dtype=float,
+    fill_value=np.nan,
+) -> np.ndarray:
+    column_name = _find_first_column_name(getattr(table, "colnames", []), candidates)
+    if column_name is None:
+        return np.full(len(table), fill_value, dtype=dtype)
+
+    column = table[column_name]
+    try:
+        masked_values = np.ma.asarray(column, dtype=dtype)
+        values = np.ma.filled(masked_values, fill_value)
+    except Exception:
+        try:
+            values = np.asarray(column, dtype=dtype)
+        except Exception:
+            values = np.asarray(column)
+            return values.astype(dtype, copy=False)
+    return np.asarray(values, dtype=dtype)
+
+
+def axis_ratio_to_inclination_deg(
+    axis_ratio: np.ndarray,
+    intrinsic_thickness: float = 0.2,
+) -> np.ndarray:
+    axis_ratio = np.asarray(axis_ratio, dtype=float)
+    axis_ratio_sq = axis_ratio**2
+    intrinsic_sq = intrinsic_thickness**2
+    with np.errstate(invalid="ignore", divide="ignore"):
+        cos_i_sq = (axis_ratio_sq - intrinsic_sq) / (1.0 - intrinsic_sq)
+    cos_i_sq = np.clip(cos_i_sq, 0.0, 1.0)
+    return np.degrees(np.arccos(np.sqrt(cos_i_sq)))
+
+
+def build_base_sample_catalog() -> pd.DataFrame:
+    """Build the parent sample catalog from DRPALL metadata."""
+    from src.data.fits import FitsUtil
+
+    fits_util = FitsUtil(settings.data_dir)
+    drpall_util = DrpallUtil(fits_util.get_drpall_file())
+    table = drpall_util.get_all_fits()
+
+    plate_ifu = _table_column_to_array(
+        table,
+        ["PLATEIFU", "plateifu", "PLATE_IFU", "plate_ifu"],
+        dtype=str,
+        fill_value="",
+    )
+    redshift = _table_column_to_array(
+        table,
+        ["NSA_Z", "nsa_z", "NSA_ZDIST", "nsa_zdist", "Z", "z"],
+    )
+    stellar_mass = _table_column_to_array(
+        table,
+        ["NSA_ELPETRO_MASS", "nsa_elpetro_mass"],
+    )
+    stellar_mass_alt = _table_column_to_array(
+        table,
+        ["NSA_SERSIC_MASS", "nsa_sersic_mass"],
+    )
+    stellar_mass = np.where(
+        np.isfinite(stellar_mass) & (stellar_mass > 0),
+        stellar_mass,
+        stellar_mass_alt,
+    )
+    log10_mstar = np.full_like(stellar_mass, np.nan, dtype=float)
+    valid_mass = np.isfinite(stellar_mass) & (stellar_mass > 0)
+    log10_mstar[valid_mass] = np.log10(stellar_mass[valid_mass])
+
+    axis_ratio = _table_column_to_array(table, ["NSA_SERSIC_BA", "nsa_elpetro_ba"])
+    inclination = axis_ratio_to_inclination_deg(axis_ratio)
+    sersic_n = _table_column_to_array(table, ["NSA_SERSIC_N", "nsa_sersic_n"])
+
+    catalog = pd.DataFrame(
+        {
+            "redshift": np.asarray(redshift, dtype=float),
+            "log10_mstar": np.asarray(log10_mstar, dtype=float),
+            "inclination": np.asarray(inclination, dtype=float),
+            "sersic_n": np.asarray(sersic_n, dtype=float),
+        },
+        index=pd.Index(np.asarray(plate_ifu, dtype=str), name="plate_ifu"),
+    )
+    return catalog[~catalog.index.duplicated(keep="first")]
+
+
+def load_all_sample_catalog(ifu_file: str | Path | None = None) -> pd.DataFrame:
+    """Load the configured parent IFU list and attach DRPALL catalog columns."""
+    plate_ifu_file = (
+        settings.resolve_input_path(ifu_file)
+        if ifu_file is not None
+        else settings.data_dir / PLATES_FILENAME
+    )
+    if not plate_ifu_file.exists():
+        raise FileNotFoundError(f"All-sample file not found: {plate_ifu_file}")
+
+    with open(plate_ifu_file, "r", encoding="utf-8") as handle:
+        plate_ifus = [line.strip() for line in handle if line.strip()]
+
+    catalog = build_base_sample_catalog()
+    return catalog.reindex(pd.Index(plate_ifus, dtype=str, name="plate_ifu")).copy()
+
+
+def load_screened_sample_catalog(result_dir: str | Path | None = None) -> pd.DataFrame:
+    """Load the Stage 1 screened sample catalog keyed by PLATE-IFU."""
+    active_result_dir = settings.resolve_result_dir(result_dir)
+    rc_param_file = active_result_dir / "rc_param.csv"
+    if not rc_param_file.exists():
+        raise FileNotFoundError(f"Screened-sample file not found: {rc_param_file}")
+
+    rc_df = pd.read_csv(rc_param_file, index_col=0)
+    rc_df.index = rc_df.index.map(str)
+
+    catalog = build_base_sample_catalog()
+    screened_catalog = catalog.reindex(rc_df.index).copy()
+    if "inc_deg" in rc_df.columns:
+        screened_catalog.loc[:, "inclination"] = rc_df.loc[
+            screened_catalog.index,
+            "inc_deg",
+        ].to_numpy(dtype=float)
+    return screened_catalog
+
+
+def load_sample_catalog_from_ifu_file(
+    sample_file: str | Path,
+) -> tuple[Path, pd.DataFrame]:
+    """Load an IFU-list file and return its path plus catalog rows."""
+    sample_path = settings.resolve_input_path(sample_file)
+    if not sample_path.exists():
+        raise FileNotFoundError(f"Sample IFU file not found: {sample_path}")
+
+    with open(sample_path, "r", encoding="utf-8") as handle:
+        plate_ifus = [line.strip() for line in handle if line.strip()]
+
+    catalog = build_base_sample_catalog()
+    sample_catalog = catalog.reindex(
+        pd.Index(plate_ifus, dtype=str, name="plate_ifu")
+    ).copy()
+    return sample_path, sample_catalog

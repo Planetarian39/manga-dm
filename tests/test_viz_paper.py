@@ -21,18 +21,7 @@ class VizPaperTests(unittest.TestCase):
         else:
             sys.modules[name] = original
 
-    def test_sample_attrition_uses_current_population_module(self) -> None:
-        calls: list[dict[str, object]] = []
-
-        fake_population = types.ModuleType("src.models.population")
-
-        def fake_plot_sample_attrition_pipeline(*args, **kwargs):
-            calls.append({"args": args, "kwargs": kwargs})
-            return Path("attrition.png")
-
-        fake_population.plot_sample_attrition_pipeline = fake_plot_sample_attrition_pipeline
-        self._install_module("src.models.population", fake_population)
-
+    def test_sample_attrition_lives_in_viz_paper_not_legacy_m200(self) -> None:
         fake_m200 = types.ModuleType("m200")
 
         def legacy_called(*args, **kwargs):
@@ -41,11 +30,7 @@ class VizPaperTests(unittest.TestCase):
         fake_m200.plot_sample_attrition_pipeline = legacy_called
         self._install_module("m200", fake_m200)
 
-        result = plot_sample_attrition_pipeline("specs", output_path=Path("out.png"))
-
-        self.assertEqual(result, Path("attrition.png"))
-        self.assertEqual(calls[0]["args"], ("specs",))
-        self.assertEqual(calls[0]["kwargs"], {"output_path": Path("out.png")})
+        self.assertEqual(plot_sample_attrition_pipeline.__module__, "src.viz.paper")
 
     def test_m200_relation_plot_does_not_import_legacy_m200(self) -> None:
         fake_m200 = types.ModuleType("m200")

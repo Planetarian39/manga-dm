@@ -9,12 +9,15 @@ explicitly.  Callers should obtain the result directory from
 
 from __future__ import annotations
 
+import ast
 import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import xarray as xr
+
+from src.config.settings import settings
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -97,6 +100,163 @@ def get_processed_plate_ifus(
         return set()
 
     return {str(idx) for idx in df.index.tolist()}
+
+
+def load_m200_c_result_table(
+    result_dir: Path | str | None = None,
+    filename: str | None = None,
+) -> pd.DataFrame:
+    """Load the Stage 1 NFW parameter table used as Stage 2 input."""
+    active_result_dir = settings.resolve_result_dir(result_dir)
+    table_filename = filename or settings.nfw_param_cm200_filename
+    nfw_param_file = active_result_dir / table_filename
+    if not nfw_param_file.exists():
+        raise FileNotFoundError(f"Data file not found: {nfw_param_file}")
+
+    df = pd.read_csv(nfw_param_file, index_col=0)
+    df.index = df.index.map(str)
+    return df
+
+
+def _parse_object_column(df: pd.DataFrame, column_name: str) -> np.ndarray | None:
+    if column_name not in df.columns:
+        return None
+
+    try:
+        return np.array(
+            [
+                ast.literal_eval(value) if isinstance(value, str) else value
+                for value in df[column_name]
+            ],
+            dtype=object,
+        )
+    except Exception as exc:
+        print(f"Warning: Could not parse {column_name}: {exc}")
+        return None
+
+
+def attach_posterior_samples_to_m200_c_data(
+    data: dict,
+    plate_ifus: list[str],
+    result_dir: Path | str | None = None,
+    filename: str | None = None,
+) -> dict:
+    """Attach merged per-galaxy posterior samples to a Stage 2 data dict."""
+    active_result_dir = settings.resolve_result_dir(result_dir)
+    sample_filename = filename or settings.nfw_param_cm200_sample_filename
+    sample_file = active_result_dir / sample_filename
+
+    log10_m200_samples = np.array([None] * len(plate_ifus), dtype=object)
+    log10_c_samples = np.array([None] * len(plate_ifus), dtype=object)
+    sample_map = load_posterior_sample_map(sample_file, plate_ifus=plate_ifus)
+    for idx, plate_ifu in enumerate(plate_ifus):
+        samples = sample_map.get(str(plate_ifu))
+        if samples is None:
+            continue
+        log10_m200_samples[idx] = samples[0]
+        log10_c_samples[idx] = samples[1]
+
+    data["log10_M200_posterior_samples"] = log10_m200_samples
+    data["log10_c_posterior_samples"] = log10_c_samples
+    return data
+
+
+def m200_c_table_to_data_dict(
+    df: pd.DataFrame,
+    result_dir: Path | str | None = None,
+    *,
+    include_posterior_samples: bool = True,
+) -> dict:
+    """Convert a prepared Stage 2 table into model-input arrays."""
+    plate_ifus = df.index.astype(str).tolist()
+    data = {
+        "plate_ifu": df.index.to_numpy(dtype=str),
+        "log10_mstar": (
+            df["log10_mstar"].values
+            if "log10_mstar" in df.columns
+            else np.full(len(df), np.nan)
+        ),
+        "sersic_n": (
+            df["sersic_n"].values if "sersic_n" in df.columns else np.zeros(len(df))
+        ),
+        "nrmse": df["nrmse"].values if "nrmse" in df.columns else np.zeros(len(df)),
+        "M200": df["M200"].values if "M200" in df.columns else None,
+        "c": df["c"].values if "c" in df.columns else None,
+        "log10_gmm_source": (
+            df["log10_gmm_source"].values
+            if "log10_gmm_source" in df.columns
+            else None
+        ),
+        "log10_gmm_n_components": (
+            df["log10_gmm_n_components"].values
+            if "log10_gmm_n_components" in df.columns
+            else None
+        ),
+        "log10_gmm_weights": _parse_object_column(df, "log10_gmm_weights"),
+        "log10_gmm_means": _parse_object_column(df, "log10_gmm_means"),
+        "log10_gmm_covariances": _parse_object_column(
+            df,
+            "log10_gmm_covariances",
+        ),
+        "log10_gmm_bic": (
+            df["log10_gmm_bic"].values if "log10_gmm_bic" in df.columns else None
+        ),
+        "log10_gmm_bic_by_n": _parse_object_column(df, "log10_gmm_bic_by_n"),
+        "log10_M200_prior_mu": (
+            df["log10_M200_prior_mu"].values
+            if "log10_M200_prior_mu" in df.columns
+            else None
+        ),
+        "log10_M200_prior_sigma": (
+            df["log10_M200_prior_sigma"].values
+            if "log10_M200_prior_sigma" in df.columns
+            else None
+        ),
+        "log10_M200_prior_lower": (
+            df["log10_M200_prior_lower"].values
+            if "log10_M200_prior_lower" in df.columns
+            else None
+        ),
+        "log10_M200_prior_upper": (
+            df["log10_M200_prior_upper"].values
+            if "log10_M200_prior_upper" in df.columns
+            else None
+        ),
+        "log10_c_prior_mu": (
+            df["log10_c_prior_mu"].values if "log10_c_prior_mu" in df.columns else None
+        ),
+        "log10_c_prior_sigma": (
+            df["log10_c_prior_sigma"].values
+            if "log10_c_prior_sigma" in df.columns
+            else None
+        ),
+    }
+
+    if include_posterior_samples:
+        attach_posterior_samples_to_m200_c_data(
+            data,
+            plate_ifus,
+            result_dir=result_dir,
+        )
+    return data
+
+
+def get_m200_c_data(
+    result_dir: Path | str | None = None,
+    dataframe: pd.DataFrame | None = None,
+    *,
+    include_posterior_samples: bool = True,
+) -> dict | None:
+    """Load Stage 2 c-M200 model inputs from an already prepared table or CSV."""
+    df = dataframe if dataframe is not None else load_m200_c_result_table(result_dir)
+    if df.empty:
+        print("Warning: No successful fits found in data.")
+        return None
+    return m200_c_table_to_data_dict(
+        df,
+        result_dir=result_dir,
+        include_posterior_samples=include_posterior_samples,
+    )
 
 
 # ═══════════════════════════════════════════════════════════════════════════

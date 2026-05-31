@@ -199,9 +199,9 @@
 
 **验收标准：**
 
-- [ ] catalog 构建函数迁入 `src.data.catalog`。
-- [ ] 后验样本读取函数迁入 `src.data.results`。
-- [ ] `src.models.population` 不直接读取项目路径或 CSV 文件，除非是模型输入文件显式参数。
+- [x] catalog 构建函数迁入 `src.data.catalog`。
+- [x] 后验样本读取函数迁入 `src.data.results`。
+- [x] `src.models.population` 不直接读取项目路径或 CSV 文件，除非是模型输入文件显式参数。
 
 ### US-3.2 — 从 `population.py` 移出样本筛选逻辑
 
@@ -211,9 +211,9 @@
 
 **验收标准：**
 
-- [ ] `_filter_dataframe_by_*` 和 `_resolve_quality_filter_thresholds` 位于 `src.pipeline.selection`。
-- [ ] `generate_robustness_sample` 位于 `src.pipeline.selection`。
-- [ ] `src.models.population.fit_m200_c_mcmc` 接收准备好的模型输入或通过明确参数加载。
+- [x] `_filter_dataframe_by_*` 和 `_resolve_quality_filter_thresholds` 位于 `src.pipeline.selection`。
+- [x] `generate_robustness_sample` 位于 `src.pipeline.selection`。
+- [x] `src.models.population.fit_m200_c_mcmc` 接收准备好的模型输入或通过明确参数加载。
 
 ### US-3.3 — 从 `population.py` 移出绘图逻辑
 
@@ -223,9 +223,9 @@
 
 **验收标准：**
 
-- [ ] 群体关系图函数位于 `src.viz.paper`。
-- [ ] 后验诊断图函数位于 `src.viz.posterior`。
-- [ ] `src.models.population` 不定义 `plot_*` 函数。
+- [x] 群体关系图函数位于 `src.viz.paper`。
+- [x] 后验诊断图函数位于 `src.viz.posterior`。
+- [x] `src.models.population` 不定义 `plot_*` 函数。
 
 ---
 
@@ -370,9 +370,9 @@ Epic 0 文档与基线
 | Epic 2 | US-2.2 Stage 2 去历史委托 | completed |
 | Epic 2 | US-2.3 接通 Stage 2 诊断 | completed |
 | Epic 2 | US-2.4 selection 去历史委托 | completed |
-| Epic 3 | US-3.1 移出数据加载逻辑 | pending |
-| Epic 3 | US-3.2 移出样本筛选逻辑 | pending |
-| Epic 3 | US-3.3 移出绘图逻辑 | pending |
+| Epic 3 | US-3.1 移出数据加载逻辑 | completed |
+| Epic 3 | US-3.2 移出样本筛选逻辑 | completed |
+| Epic 3 | US-3.3 移出绘图逻辑 | completed |
 | Epic 4 | US-4.1 实现 RC 曲线图 | completed |
 | Epic 4 | US-4.2 实现速度场图 | completed |
 | Epic 4 | US-4.3 实现后验诊断图 | completed |
