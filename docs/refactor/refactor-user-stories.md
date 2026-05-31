@@ -360,23 +360,23 @@ Epic 0 文档与基线
 
 | Epic | Story | 状态 |
 |------|-------|------|
-| Epic 0 | US-0.1 修正包结构描述 | pending |
-| Epic 0 | US-0.2 建立历史委托清单 | pending |
-| Epic 0 | US-0.3 建立 CLI 基线验证 | pending |
-| Epic 1 | US-1.1 接通 `--config` | pending |
-| Epic 1 | US-1.2 接通目录 override | pending |
-| Epic 1 | US-1.3 保持 CLI 无业务逻辑 | pending |
-| Epic 2 | US-2.1 Stage 1 去历史委托 | pending |
-| Epic 2 | US-2.2 Stage 2 去历史委托 | pending |
-| Epic 2 | US-2.3 接通 Stage 2 诊断 | pending |
-| Epic 2 | US-2.4 selection 去历史委托 | pending |
+| Epic 0 | US-0.1 修正包结构描述 | completed |
+| Epic 0 | US-0.2 建立历史委托清单 | completed |
+| Epic 0 | US-0.3 建立 CLI 基线验证 | completed |
+| Epic 1 | US-1.1 接通 `--config` | completed |
+| Epic 1 | US-1.2 接通目录 override | completed |
+| Epic 1 | US-1.3 保持 CLI 无业务逻辑 | completed |
+| Epic 2 | US-2.1 Stage 1 去历史委托 | completed |
+| Epic 2 | US-2.2 Stage 2 去历史委托 | completed |
+| Epic 2 | US-2.3 接通 Stage 2 诊断 | completed |
+| Epic 2 | US-2.4 selection 去历史委托 | completed |
 | Epic 3 | US-3.1 移出数据加载逻辑 | pending |
 | Epic 3 | US-3.2 移出样本筛选逻辑 | pending |
 | Epic 3 | US-3.3 移出绘图逻辑 | pending |
-| Epic 4 | US-4.1 实现 RC 曲线图 | pending |
-| Epic 4 | US-4.2 实现速度场图 | pending |
-| Epic 4 | US-4.3 实现后验诊断图 | pending |
-| Epic 4 | US-4.4 实现论文组合图 | pending |
-| Epic 5 | US-5.1 标记历史脚本边界 | pending |
-| Epic 5 | US-5.2 同步 README 命令示例 | pending |
-| Epic 5 | US-5.3 最终依赖扫描 | pending |
+| Epic 4 | US-4.1 实现 RC 曲线图 | completed |
+| Epic 4 | US-4.2 实现速度场图 | completed |
+| Epic 4 | US-4.3 实现后验诊断图 | completed |
+| Epic 4 | US-4.4 实现论文组合图 | completed |
+| Epic 5 | US-5.1 标记历史脚本边界 | completed |
+| Epic 5 | US-5.2 同步 README 命令示例 | completed |
+| Epic 5 | US-5.3 最终依赖扫描 | completed |
