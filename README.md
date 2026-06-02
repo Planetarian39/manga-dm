@@ -1,4 +1,14 @@
-# manga-dm
+# MaNGA Dark Matter
+
+`manga-dm` is a MaNGA dark matter analysis pipeline for selecting galaxy samples, fitting rotation curves and NFW halos, and running population-level inference on the halo-mass concentration relation.
+
+The project provides:
+
+- A unified `manga` CLI for the full workflow
+- Reusable Python modules for data access, modeling, and inference
+- Figure-generation and posterior-merging utilities for analysis runs
+
+If you want the Bayesian background behind the MCMC-based inference in this project, start with [How and Why to Use MCMC: A Practical Guide to Bayesian Inference](docs/mcmc/how-and-why-to-use-mcmc.md).
 
 MaNGA dark matter analysis and fitting pipeline.
 
