@@ -1,6 +1,6 @@
 # AGENTS.md
 
-This file provides operating rules for future automated agents working in this repository. The goal is to keep changes aligned with the current code structure, avoid breaking the scientific pipeline, and preserve legacy entry points.
+This file provides operating rules for future automated agents working in this repository. The goal is to keep changes aligned with the current code structure and avoid breaking the scientific pipeline.
 
 ## Project Overview
 
@@ -8,7 +8,6 @@ This file provides operating rules for future automated agents working in this r
 - Language: Python
 - Domain: MaNGA dark matter analysis and fitting pipeline
 - Current official entry point: `manga` CLI
-- Compatibility entry points: legacy scripts under `src/` and `src-orig/`
 
 ## Directory Responsibilities
 
@@ -20,8 +19,7 @@ This file provides operating rules for future automated agents working in this r
 - `src/pipeline/`: workflow orchestration
 - `src/stats/`: statistical utilities
 - `src/viz/`: visualization
-- `src-orig/`: historical scripts kept for compatibility
-- `docs/`: refactor notes and user stories
+- `docs/`: project notes and technical articles
 - `var/`: runtime-generated content or temporary data, treated as volatile
 
 ## Key Entry Points
@@ -56,14 +54,13 @@ This file provides operating rules for future automated agents working in this r
 ## Modification Priority
 
 1. Preserve behavior first, then improve structure
-2. Keep legacy scripts runnable whenever possible
+2. Keep the official `manga` CLI runnable
 3. Extract reusable logic into new modules before rewriting callers
 4. Avoid changing scientific model internals unless explicitly requested and numerically validated
 
 ## Explicit Do Nots
 
 - Do not casually change internal PyMC implementations unless the user explicitly asks and numerical consistency has been verified
-- Do not remove compatibility entry points under `src-orig/` unless all callers have clearly migrated
 - Do not change output file formats, field names, or naming conventions unless a migration plan exists
 - Do not introduce global state, singleton caches, or hidden side effects unless necessary
 - Do not keep adding data processing, statistics, and plotting logic to the CLI layer
@@ -112,8 +109,6 @@ manga figures --ifu 8994-12701 7977-3704
 ## Reference Documents
 
 - `README.md`
-- `docs/refactor-plan.md`
-- `docs/refactor-user-stories.md`
 - `pyproject.toml`
 - `src/cli/main.py`
 - `src/config/settings.py`

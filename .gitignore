@@ -97,6 +97,5 @@ tmpclaude*
 *.blg
 *.bbl
 docs/latex/*.pdf
-docs/refactor
 
 .codebase-memory/

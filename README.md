@@ -59,18 +59,17 @@ manga --help
 manga <subcommand> --help
 ```
 
-| Subcommand | Description | Legacy equivalent |
-|---|---|---|
-| `manga select` | Select galaxy sample and optionally download data | `python src-orig/plates.py` |
-| `manga stage1` | Single-galaxy RC + DM NFW fitting | `python src-orig/main.py` |
-| `manga stage2` | Population inference and PSIS diagnostics | `python src-orig/m200.py` |
-| `manga figures` | Generate paper figures | `python src-orig/figure.py` |
-| `manga merge` | Merge posterior sample files | extracted from `src-orig/m200.py` |
-| `manga sample` | Generate robustness sub-samples | extracted from `src-orig/m200.py` |
+| Subcommand | Description |
+|---|---|
+| `manga select` | Select galaxy sample and optionally download data |
+| `manga stage1` | Single-galaxy RC + DM NFW fitting |
+| `manga stage2` | Population inference and PSIS diagnostics |
+| `manga figures` | Generate paper figures |
+| `manga merge` | Merge posterior sample files |
+| `manga sample` | Generate robustness sub-samples |
 
 The installed `manga` command and `python -m src` run the current `src/`
-package. `src-orig/` is retained only as a legacy compatibility layer and
-should not receive new feature development.
+package.
 
 ## Typical Workflow
 
@@ -163,20 +162,5 @@ src/
   pipeline/                 # workflow orchestration
   stats/                    # model-independent statistical utilities
   viz/                      # visualization helpers and paper figures
-src-orig/                   # historical scripts kept for compatibility
-docs/                       # refactor notes and user stories
+docs/                       # project notes and technical articles
 ```
-
-## Legacy Scripts
-
-The original monolithic scripts remain in `src-orig/` for backward
-compatibility:
-
-```bash
-python src-orig/main.py
-python src-orig/m200.py
-```
-
-The current `src/` package does not rely on `src-orig/` at runtime. Treat
-`src-orig/` as historical compatibility code, not as the place for new
-features.
