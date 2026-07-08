@@ -99,3 +99,4 @@ tmpclaude*
 docs/latex/*.pdf
 docs/refactor
 
+.codebase-memory/
