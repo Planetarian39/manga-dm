@@ -30,6 +30,14 @@ def _imported_modules(tree: ast.Module) -> set[str]:
     return modules
 
 
+def _imported_names_from(tree: ast.Module, module_name: str) -> set[str]:
+    names: set[str] = set()
+    for node in tree.body:
+        if isinstance(node, ast.ImportFrom) and node.module == module_name:
+            names.update(alias.name for alias in node.names)
+    return names
+
+
 class Epic3BoundaryTests(unittest.TestCase):
     def test_population_no_longer_defines_plot_or_selection_functions(self) -> None:
         tree = _module_tree("src/models/population.py")
@@ -70,6 +78,22 @@ class Epic3BoundaryTests(unittest.TestCase):
         self.assertIn("plot_m200_c_relation_all", paper_functions)
         self.assertIn("plot_sample_attrition_pipeline", paper_functions)
         self.assertIn("plot_population_posterior_diagnostics", posterior_functions)
+
+    def test_population_posterior_uses_model_prior_constants(self) -> None:
+        imports = _imported_names_from(
+            _module_tree("src/viz/posterior.py"),
+            "src.config.constants",
+        )
+
+        self.assertTrue(
+            {
+                "LOG10_C0_PRIOR_MEAN",
+                "LOG10_C0_PRIOR_SIGMA",
+                "ALPHA_PRIOR_MEAN",
+                "ALPHA_PRIOR_SIGMA",
+            }.issubset(imports),
+            "posterior diagnostics must use the same population prior defaults as the model",
+        )
 
 
 if __name__ == "__main__":

@@ -8,7 +8,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.stats import norm
 
-from src.config.constants import COLOR_DATA_POINTS, COLOR_HDI_BAND, COLOR_HIGH_N, COLOR_LOW_N
+from src.config.constants import (
+    ALPHA_PRIOR_MEAN,
+    ALPHA_PRIOR_SIGMA,
+    COLOR_DATA_POINTS,
+    COLOR_HDI_BAND,
+    COLOR_HIGH_N,
+    COLOR_LOW_N,
+    LOG10_C0_PRIOR_MEAN,
+    LOG10_C0_PRIOR_SIGMA,
+)
 from src.config.settings import settings
 from src.stats.intervals import format_pair_interval_title
 from src.viz.utils import plot_posterior_1d_hdi
@@ -120,19 +129,15 @@ def _build_prior_posterior_density_data(
     rng = np.random.default_rng(42)
     prior_samples = {
         "log10_c0": rng.normal(
-            loc=float(settings.LOG10_C0_PRIOR_MEAN),
-            scale=float(settings.LOG10_C0_PRIOR_SIGMA),
+            loc=LOG10_C0_PRIOR_MEAN,
+            scale=LOG10_C0_PRIOR_SIGMA,
             size=prior_draw_count,
-        )
-        if hasattr(settings, "LOG10_C0_PRIOR_MEAN")
-        else rng.normal(loc=0.9, scale=0.2, size=prior_draw_count),
+        ),
         "alpha": rng.normal(
-            loc=float(settings.ALPHA_PRIOR_MEAN),
-            scale=float(settings.ALPHA_PRIOR_SIGMA),
+            loc=ALPHA_PRIOR_MEAN,
+            scale=ALPHA_PRIOR_SIGMA,
             size=prior_draw_count,
-        )
-        if hasattr(settings, "ALPHA_PRIOR_MEAN")
-        else rng.normal(loc=-0.1, scale=0.15, size=prior_draw_count),
+        ),
     }
     prior = az_api.from_dict(
         posterior={key: value[None, :] for key, value in prior_samples.items()}
