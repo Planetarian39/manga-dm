@@ -75,13 +75,13 @@ class Stage2PipelineTests(unittest.TestCase):
         fake_results.merge_posterior_samples_file = lambda *args, **kwargs: None
         self._install_module("src.data.results", fake_results)
 
-        fake_population = types.ModuleType("src.models.population")
+        fake_population = types.ModuleType("src.pipeline.population")
 
         def fake_fit_m200_c_population(**kwargs):
             calls.append(kwargs)
 
         fake_population.fit_m200_c_population = fake_fit_m200_c_population
-        self._install_module("src.models.population", fake_population)
+        self._install_module("src.pipeline.population", fake_population)
 
         fake_m200 = types.ModuleType("m200")
         fake_m200._set_result_dir = lambda *args, **kwargs: None
@@ -120,14 +120,14 @@ class Stage2PipelineTests(unittest.TestCase):
         fake_results.merge_posterior_samples_file = lambda *args, **kwargs: None
         self._install_module("src.data.results", fake_results)
 
-        fake_population = types.ModuleType("src.models.population")
+        fake_population = types.ModuleType("src.pipeline.population")
 
         def fake_run_m200_c_psis_diagnostics(**kwargs):
             calls.append(kwargs)
             return {"n_bad_k": 0}
 
         fake_population.run_m200_c_psis_diagnostics = fake_run_m200_c_psis_diagnostics
-        self._install_module("src.models.population", fake_population)
+        self._install_module("src.pipeline.population", fake_population)
 
         fake_m200 = types.ModuleType("m200")
 

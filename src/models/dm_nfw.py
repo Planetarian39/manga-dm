@@ -48,7 +48,6 @@ from src.stats.intervals import (
     format_pair_interval_title,
 )
 from src.stats.gmm import fit_log10_mc_gmm
-from src.viz.posterior import annotate_pair_marginals
 
 # ── ArviZ compat ────────────────────────────────────────────────────
 az = ensure_arviz_compat()
@@ -78,7 +77,88 @@ _calc_interval_overlap_mask = calc_interval_overlap_mask
 _get_interval_value_formatter = get_interval_value_formatter
 _format_pair_interval_title = format_pair_interval_title
 _fit_log10_mc_gmm = fit_log10_mc_gmm
-_annotate_pair_marginals = annotate_pair_marginals
+
+
+def _get_pair_plot_label(var_name: str) -> str:
+    label_map = {
+        "Mstar": r"M_\star",
+        "M200": r"M_{200}",
+        "c": "c",
+        "v_sys": r"v_{\mathrm{sys}}",
+        "inc": "i",
+        "f_bulge": r"f_{\mathrm{bulge}}",
+        "sigma_0": r"\sigma_0",
+        "Re": "R_e",
+        "sigma_int": r"\sigma_{\mathrm{int}}",
+    }
+    return label_map.get(var_name, var_name)
+
+
+def _get_pair_plot_unit_label(var_name: str) -> str:
+    unit_map = {
+        "Mstar": r"M_\odot",
+        "M200": r"M_\odot",
+        "v_sys": r"\mathrm{km\,s^{-1}}",
+        "sigma_0": r"\mathrm{km\,s^{-1}}",
+        "Re": r"\mathrm{kpc}",
+        "sigma_int": r"\mathrm{km\,s^{-1}}",
+    }
+    return unit_map.get(var_name, "")
+
+
+def _get_trace_values(trace, var_name: str) -> np.ndarray | None:
+    if var_name not in trace:
+        return None
+    value = trace[var_name]
+    values = getattr(value, "values", value)
+    samples = np.asarray(values, dtype=float).reshape(-1)
+    samples = samples[np.isfinite(samples)]
+    return samples if samples.size >= 2 else None
+
+
+def _annotate_pair_marginals(
+    pair_axes,
+    flat_trace,
+    plotted_var_names: list[str],
+    title_fontsize: float = 9,
+    plot_median_line: bool = False,
+) -> None:
+    axes = np.asarray(pair_axes, dtype=object)
+    if axes.ndim != 2:
+        return
+
+    diagonal_count = min(len(plotted_var_names), axes.shape[0], axes.shape[1])
+    for idx in range(diagonal_count):
+        ax = axes[idx, idx]
+        if ax is None:
+            continue
+
+        var_name = plotted_var_names[idx]
+        samples = _get_trace_values(flat_trace, var_name)
+        if samples is None:
+            continue
+
+        low, median, high = np.percentile(samples, [16, 50, 84])
+        if plot_median_line:
+            line_color = ax.title.get_color()
+            if line_color in (None, "auto"):
+                line_color = "0.35"
+            for value in (median, low, high):
+                ax.axvline(value, color=line_color, linestyle="--", linewidth=1.0, alpha=0.85, zorder=3)
+
+        lower_err = median - low
+        upper_err = high - median
+        unit_label = _get_pair_plot_unit_label(var_name)
+        interval_text = _format_pair_interval_title(median, lower_err, upper_err, unit_label)
+        if interval_text.startswith("$") and interval_text.endswith("$"):
+            interval_text = interval_text[1:-1]
+        ax.set_title(
+            rf"${_get_pair_plot_label(var_name)} = {interval_text}$",
+            fontsize=title_fontsize,
+            pad=4,
+        )
+
+
 class DmNfw:
     drpall_util: DrpallUtil
     PLATE_IFU: str

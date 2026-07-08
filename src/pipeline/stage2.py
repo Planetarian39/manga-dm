@@ -35,7 +35,7 @@ def run_stage2(
     result_dir.mkdir(parents=True, exist_ok=True)
 
     if fit:
-        from src.models.population import fit_m200_c_population
+        from src.pipeline.population import fit_m200_c_population
 
         print(f"Running Stage 2 population MCMC fit (quality cut: {quality_cut})...")
         fit_m200_c_population(
@@ -43,7 +43,7 @@ def run_stage2(
             result_dir_override=result_dir,
         )
     elif diagnose:
-        from src.models.population import run_m200_c_psis_diagnostics
+        from src.pipeline.population import run_m200_c_psis_diagnostics
 
         print("Running PSIS diagnostics...")
         run_m200_c_psis_diagnostics(

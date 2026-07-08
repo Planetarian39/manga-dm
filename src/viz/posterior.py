@@ -19,6 +19,7 @@ from src.config.constants import (
     LOG10_C0_PRIOR_SIGMA,
 )
 from src.config.settings import settings
+from src.models.relations import H_0, log10_c_m200_relation_profile
 from src.stats.intervals import format_pair_interval_title
 from src.viz.utils import plot_posterior_1d_hdi
 
@@ -368,8 +369,6 @@ def plot_population_inference_diagnostics(
     valid_mask = (M200 > 0) & (c > 0) & np.isfinite(M200) & np.isfinite(c)
     if not np.any(valid_mask):
         return None
-
-    from src.models.population import H_0, log10_c_m200_relation_profile
 
     M200 = M200[valid_mask]
     c = c[valid_mask]

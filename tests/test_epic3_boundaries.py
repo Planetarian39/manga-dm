@@ -22,7 +22,7 @@ def _defined_functions(tree: ast.Module) -> set[str]:
 
 def _imported_modules(tree: ast.Module) -> set[str]:
     modules: set[str] = set()
-    for node in tree.body:
+    for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             modules.update(alias.name for alias in node.names)
         elif isinstance(node, ast.ImportFrom) and node.module is not None:
@@ -32,7 +32,7 @@ def _imported_modules(tree: ast.Module) -> set[str]:
 
 def _imported_names_from(tree: ast.Module, module_name: str) -> set[str]:
     names: set[str] = set()
-    for node in tree.body:
+    for node in ast.walk(tree):
         if isinstance(node, ast.ImportFrom) and node.module == module_name:
             names.update(alias.name for alias in node.names)
     return names
@@ -53,16 +53,25 @@ class Epic3BoundaryTests(unittest.TestCase):
             "sample filters should live in src.pipeline.selection",
         )
 
-    def test_population_does_not_import_pandas_xarray_or_viz(self) -> None:
+    def test_models_do_not_import_pipeline_or_viz(self) -> None:
+        forbidden: list[tuple[str, str]] = []
+        for path in sorted((REPO_ROOT / "src" / "models").glob("*.py")):
+            imports = _imported_modules(ast.parse(path.read_text(encoding="utf-8")))
+            for module in imports:
+                if module.startswith(("src.pipeline", "src.viz")):
+                    forbidden.append((path.name, module))
+
+        self.assertFalse(
+            forbidden,
+            "models must not depend on pipeline or visualization layers",
+        )
+
+    def test_population_does_not_import_pandas_xarray_or_matplotlib(self) -> None:
         imports = _imported_modules(_module_tree("src/models/population.py"))
 
         self.assertNotIn("pandas", imports)
         self.assertNotIn("xarray", imports)
         self.assertNotIn("matplotlib.pyplot", imports)
-        self.assertFalse(
-            [module for module in imports if module.startswith("src.viz")],
-            "models must not depend on the visualization layer",
-        )
 
     def test_data_selection_and_viz_own_epic3_responsibilities(self) -> None:
         catalog_functions = _defined_functions(_module_tree("src/data/catalog.py"))
@@ -80,6 +89,9 @@ class Epic3BoundaryTests(unittest.TestCase):
         self.assertIn("plot_population_posterior_diagnostics", posterior_functions)
 
     def test_population_posterior_uses_model_prior_constants(self) -> None:
+        imports = _imported_modules(_module_tree("src/viz/posterior.py"))
+        self.assertNotIn("src.models.population", imports)
+
         imports = _imported_names_from(
             _module_tree("src/viz/posterior.py"),
             "src.config.constants",

@@ -7,7 +7,7 @@ from pathlib import Path
 import numpy as np
 
 from src.config import settings as settings_module
-import src.models.population as population
+import src.pipeline.population as population
 
 
 class PopulationPipelineTests(unittest.TestCase):

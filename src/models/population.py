@@ -20,7 +20,7 @@ from scipy.optimize import brentq
 
 # New layered imports
 from src.config.constants import (
-    H0_PHYS, H_ACTUAL, M_PIVOT_H_INV,
+    M_PIVOT_H_INV,
     LOG10_C0_DM14, ALPHA_DM14, LOG10_C_SIGMA_DM14,
     LOG10_C0_LI20, LOG10_C0_SIGMA_LI20, ALPHA_LI20,
     ALPHA_SIGMA_LI20, LOG10_C_SCATTER_LI20,
@@ -31,12 +31,9 @@ from src.config.constants import (
     LOG_SIGMA_INT_PRIOR_MEAN, LOG_SIGMA_INT_PRIOR_SIGMA,
     NU_POP_PRIOR_ALPHA, NU_POP_PRIOR_BETA,
     DEFENSIVE_IS_EPSILON,
-    COLOR_DM14, COLOR_LI20, COLOR_YASIN23,
-    COLOR_HIGH_N, COLOR_LOW_N, COLOR_POSTERIOR_MEDIAN,
-    COLOR_DATA_POINTS, COLOR_SIGMA_BAND, COLOR_HDI_BAND,
-    QUALITY_FILTER_PRESETS,
 )
 from src.config.settings import settings
+from src.models.relations import H_0, log10_c_m200_relation_profile
 from src.stats.arviz_compat import (
     ensure_arviz_compat,
     get_arviz_api,
@@ -48,14 +45,12 @@ from src.stats.arviz_compat import (
 from src.stats.psis import (
     gpdfit as _gpdfit,
     is_ess_from_log_weights as _is_ess_from_log_weights,
-    compute_psis_importance_diagnostics,
 )
 
 az = None
 _get_az = get_az
 
 # ── Config / constant shims ──────────────────────────────────────────
-H_0 = H_ACTUAL  # the old code uses H_0
 HDI_PROB1 = settings.HDI_PROB1
 HDI_PROB2 = settings.HDI_PROB2
 NFW_PARAM_CM200_FILENAME = settings.nfw_param_cm200_filename
@@ -129,14 +124,6 @@ def load_m200_c_fit_results(
         return json.load(handle)
 
 
-def log10_c_m200_relation_profile(
-    M200: np.ndarray, log10_c0: float, alpha: float, h: float = H_0
-) -> np.ndarray:
-    M_pivot = M_PIVOT_H_INV / h
-    log10_c = log10_c0 + alpha * (np.log10(M200) - np.log10(M_pivot))
-    return 10 ** log10_c
-
-
 def reference_log10_c_band(
     M200: np.ndarray,
     log10_c0: float,
@@ -174,38 +161,6 @@ def reference_log10_c_band(
         log10_high = log10_high + sigma_scale * log10_c_scatter
 
     return center, 10 ** log10_low, 10 ** log10_high
-
-def get_m200_c_data(
-    result_dir_override: str | Path | None = None,
-    ifu_ids: list[str] | None = None,
-    nrmse_threshold: float | None = None,
-    quality_cut: str | None = None,
-    max_redchi: float | None = None,
-    ppc_p_min: float | None = None,
-    ppc_p_max: float | None = None,
-    ppc_value_coverage_min: float | None = None,
-    ppc_overlap_min: float | None = None,
-    max_abs_c_m200_corr: float | None = None,
-    filter_mass: str | None = None,
-    filter_n: str | None = None,
-):
-    """Compatibility wrapper for Stage 2 data preparation."""
-    from src.pipeline.selection import prepare_m200_c_data
-
-    return prepare_m200_c_data(
-        result_dir_override=result_dir_override,
-        ifu_ids=ifu_ids,
-        nrmse_threshold=nrmse_threshold,
-        quality_cut=quality_cut,
-        max_redchi=max_redchi,
-        ppc_p_min=ppc_p_min,
-        ppc_p_max=ppc_p_max,
-        ppc_value_coverage_min=ppc_value_coverage_min,
-        ppc_overlap_min=ppc_overlap_min,
-        max_abs_c_m200_corr=max_abs_c_m200_corr,
-        filter_mass=filter_mass,
-        filter_n=filter_n,
-    )
 
 def _prepare_gmm_tensors(
     log10_gmm_weights: np.ndarray,
@@ -499,130 +454,6 @@ def _compute_linear_fit(
     return coeffs[1], coeffs[0]
 
 
-def fit_m200_c_population(
-    *,
-    quality_cut: str | None = "recommended",
-    result_dir_override: str | Path | None = None,
-    ifu_ids: list[str] | None = None,
-    use_gmm: bool = True,
-    use_samples: bool = False,
-    sample_cap: int | None = None,
-    dataset_label: str = "all",
-):
-    """Load Stage 2 data and run the current population c-M200 fit."""
-    _set_result_dir(result_dir_override)
-    data = get_m200_c_data(
-        result_dir_override=result_dir_override,
-        ifu_ids=ifu_ids,
-        quality_cut=quality_cut,
-    )
-    if not data:
-        print("Failed to load data. Exiting.")
-        return None
-
-    M200 = data.get("M200")
-    c = data.get("c")
-    if M200 is None or c is None:
-        print("M200/c columns are missing from the Stage 2 input table. Exiting.")
-        return None
-
-    sample_m200 = data.get("log10_M200_posterior_samples") if use_samples else None
-    sample_c = data.get("log10_c_posterior_samples") if use_samples else None
-    sample_m200_prior_mu = data.get("log10_M200_prior_mu") if use_samples else None
-    sample_m200_prior_sigma = data.get("log10_M200_prior_sigma") if use_samples else None
-    sample_m200_prior_lower = data.get("log10_M200_prior_lower") if use_samples else None
-    sample_m200_prior_upper = data.get("log10_M200_prior_upper") if use_samples else None
-    sample_c_prior_mu = data.get("log10_c_prior_mu") if use_samples else None
-    sample_c_prior_sigma = data.get("log10_c_prior_sigma") if use_samples else None
-
-    log10_gmm_weights = data.get("log10_gmm_weights") if use_gmm else None
-    log10_gmm_means = data.get("log10_gmm_means") if use_gmm else None
-    log10_gmm_covariances = data.get("log10_gmm_covariances") if use_gmm else None
-
-    print("\n# 1. Fitting All Data")
-    print("\nUsing MCMC for fitting...")
-    fit_results = fit_m200_c_mcmc(
-        M200,
-        c,
-        log10_M200_posterior_samples=sample_m200,
-        log10_c_posterior_samples=sample_c,
-        log10_M200_prior_mu=sample_m200_prior_mu,
-        log10_M200_prior_sigma=sample_m200_prior_sigma,
-        log10_M200_prior_lower=sample_m200_prior_lower,
-        log10_M200_prior_upper=sample_m200_prior_upper,
-        log10_c_prior_mu=sample_c_prior_mu,
-        log10_c_prior_sigma=sample_c_prior_sigma,
-        log10_gmm_weights=log10_gmm_weights,
-        log10_gmm_means=log10_gmm_means,
-        log10_gmm_covariances=log10_gmm_covariances,
-        sample_cap=sample_cap,
-        dataset_label=dataset_label,
-    )
-    if fit_results:
-        save_m200_c_fit_results(fit_results, result_dir_override=result_dir_override)
-    return fit_results
-
-
-def run_m200_c_psis_diagnostics(
-    *,
-    quality_cut: str | None = "recommended",
-    result_dir_override: str | Path | None = None,
-    ifu_ids: list[str] | None = None,
-    sample_cap: int | None = None,
-) -> dict | None:
-    """Run PSIS diagnostics using saved population-fit results."""
-    fit_results = load_m200_c_fit_results(result_dir_override=result_dir_override)
-    data = get_m200_c_data(
-        result_dir_override=result_dir_override,
-        ifu_ids=ifu_ids,
-        quality_cut=quality_cut,
-    )
-    if not data:
-        raise FileNotFoundError("No Stage 2 data available for PSIS diagnostics.")
-
-    required = (
-        "log10_M200_posterior_samples",
-        "log10_c_posterior_samples",
-        "log10_M200_prior_mu",
-        "log10_M200_prior_sigma",
-        "log10_M200_prior_lower",
-        "log10_M200_prior_upper",
-        "log10_c_prior_mu",
-        "log10_c_prior_sigma",
-    )
-    missing = [key for key in required if data.get(key) is None]
-    if missing:
-        raise ValueError(
-            "PSIS diagnostics require saved posterior samples and prior parameters; "
-            f"missing: {', '.join(missing)}"
-        )
-
-    diagnostics = compute_psis_importance_diagnostics(
-        log10_M200_posterior_samples=data["log10_M200_posterior_samples"],
-        log10_c_posterior_samples=data["log10_c_posterior_samples"],
-        log10_M200_prior_mu=data["log10_M200_prior_mu"],
-        log10_M200_prior_sigma=data["log10_M200_prior_sigma"],
-        log10_M200_prior_lower=data["log10_M200_prior_lower"],
-        log10_M200_prior_upper=data["log10_M200_prior_upper"],
-        log10_c_prior_mu=data["log10_c_prior_mu"],
-        log10_c_prior_sigma=data["log10_c_prior_sigma"],
-        fit_results=fit_results,
-        plot_suffix="_all",
-        sample_cap=sample_cap,
-    )
-    if diagnostics is None:
-        raise ValueError(
-            "PSIS diagnostics could not be computed. Ensure the saved population fit used posterior samples."
-        )
-
-    print(
-        "PSIS diagnostics complete: "
-        f"bad k={diagnostics.get('n_bad_k', 0)}, "
-        f"warning k={diagnostics.get('n_warn_k', 0)}"
-    )
-    return diagnostics
-
-
 def fit_m200_c_mcmc(
     M200_obs: np.ndarray,
     c_obs: np.ndarray,
@@ -640,6 +471,7 @@ def fit_m200_c_mcmc(
     sample_cap: int | None = None,
     dataset_label: str = "all",
     verbose: bool = True,
+    posterior_diagnostics_callback=None,
 ):
     """
     Fit the non-linear c-M200 relation using a Hierarchical Bayesian Model (HBM).
@@ -959,20 +791,19 @@ def fit_m200_c_mcmc(
     alpha_samples = posterior["alpha"].values.flatten()
     sigma_int_samples = posterior["sigma_int"].values.flatten()
 
-    from src.viz.posterior import plot_population_posterior_diagnostics
-
-    plot_population_posterior_diagnostics(
-        trace=trace,
-        posterior=posterior,
-        az_api=az_api,
-        log10_c0_samples=log10_c0_samples,
-        alpha_samples=alpha_samples,
-        dataset_label=dataset_label,
-        dataset_tag=dataset_tag,
-        result_dir=result_dir,
-        hdi_prob1=HDI_PROB1,
-        hdi_prob2=HDI_PROB2,
-    )
+    if posterior_diagnostics_callback is not None:
+        posterior_diagnostics_callback(
+            trace=trace,
+            posterior=posterior,
+            az_api=az_api,
+            log10_c0_samples=log10_c0_samples,
+            alpha_samples=alpha_samples,
+            dataset_label=dataset_label,
+            dataset_tag=dataset_tag,
+            result_dir=result_dir,
+            hdi_prob1=HDI_PROB1,
+            hdi_prob2=HDI_PROB2,
+        )
     log10_c0_eti_low = float(summary.loc["log10_c0", eti_low_col])
     log10_c0_eti_high = float(summary.loc["log10_c0", eti_high_col])
     alpha_eti_low = float(summary.loc["alpha", eti_low_col])
