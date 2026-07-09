@@ -1,6 +1,10 @@
+---
+title: "How and Why to Use MCMC"
+---
+
 # How and Why to Use MCMC: A Practical Guide to Bayesian Inference
 
-As a newcomer to MCMC, by the end of this guide you should understand the fundamental principles of MCMC and be able to apply it to parameter estimation problems.
+This guide introduces the Bayesian and MCMC concepts used by `manga-dm`, then connects them to the MaNGA NFW halo inference workflow. It is written for readers who want enough background to understand why the pipeline uses posterior samples rather than only point estimates.
 
 ---
 
@@ -336,7 +340,7 @@ Extract results from posterior samples
 
 ## 5. Astrophysical Example: MaNGA Galaxy Dark Matter Halo Parameter Inference
 
-> This chapter uses the `dm.py` module as an example to demonstrate the complete workflow of MCMC in real astrophysical research.
+> This chapter uses the current NFW model implementation, `src.models.dm_nfw.DmNfw`, as an example of MCMC in an astrophysical workflow.
 
 ### 5.1 Problem Background
 
@@ -645,7 +649,7 @@ az.plot_pair(trace, var_names=["M200", "c"],
              kde_kwargs={"contourf_kwargs": {"alpha": 0.5}})
 ```
 
-Alternatively, the `corner` package can produce more refined contour plots (this is what `dm.py` uses internally).
+Alternatively, the `corner` package can produce more refined contour plots; this is the style used by the NFW diagnostics in this project.
 
 ---
 
@@ -722,7 +726,7 @@ Below are the posterior summary statistics for this inference, using **ETI (Equa
 > **ETI vs. HDI**: ETI takes quantiles with equal probability on both sides; HDI (Highest Density Interval) takes the shortest interval containing the highest posterior density. For symmetric unimodal posteriors they are nearly identical; for skewed or bimodal posteriors, HDI is narrower and includes the mode, while ETI leans toward the tails. `az.summary` returns ETI by default, as does this table.
 
 | Parameter | Units | median | ETI 15.9% | ETI 84.1% | $\hat{R}$ | ESS |
-|---|---|---|---:|---:|---:|---:|---:|
+|---|---|---:|---:|---:|---:|---:|
 | $M_\star$ | $M_\odot$ | $1.095\times10^{11}$ | $9.975\times10^{10}$ | $1.204\times10^{11}$ | 1.003 | 804 |
 | $M_{200}$ | $M_\odot$ | $3.750\times10^{12}$ | $2.648\times10^{12}$ | $5.384\times10^{12}$ | 1.007 | 1656 |
 | $c$ | — | 9.61 | 7.90 | 11.55 | 1.005 | 953 |

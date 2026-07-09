@@ -1,4 +1,10 @@
+---
+title: "Research Option: Inner Rotation-Curve Shapes"
+---
+
 # Research Option: Inner Rotation-Curve Shapes and Dark-Matter-Relevant Central Concentration
+
+This note is a public-facing research direction for extending `manga-dm`. It is not part of the current production CLI workflow; it frames a possible next project around inner rotation-curve morphology, baryonic decomposition, and dark-matter-relevant candidate discovery.
 
 ## 1. Working Title
 

@@ -1,24 +1,32 @@
 # MaNGA Dark Matter
 
-`manga-dm` is a MaNGA dark matter analysis pipeline for selecting galaxy samples, fitting rotation curves and NFW halos, and running population-level inference on the halo-mass concentration relation.
+`manga-dm` is a research pipeline for MaNGA dark-matter analysis. It selects MaNGA galaxies, fits gas rotation curves, runs single-galaxy NFW halo inference, merges posterior samples, and fits a population-level halo mass-concentration relation.
 
-The project provides:
+The current implementation lives in `src/` and is exposed through the `manga` command-line interface.
 
-- A unified `manga` CLI for the full workflow
-- Reusable Python modules for data access, modeling, and inference
-- Figure-generation and posterior-merging utilities for analysis runs
+## What It Does
 
-If you want the Bayesian background behind the MCMC-based inference in this project, start with [How and Why to Use MCMC: A Practical Guide to Bayesian Inference](docs/mcmc/how-and-why-to-use-mcmc.md).
+- Selects MaNGA DR17 galaxy samples and optionally downloads required data products.
+- Fits per-galaxy rotation curves from H-alpha velocity maps.
+- Runs Bayesian NFW halo inference with PyMC for galaxies that pass quality gates.
+- Merges per-galaxy posterior samples into a common NetCDF product.
+- Fits and diagnoses the population-level `M200-c` relation.
+- Generates figures and robustness subsamples for analysis workflows.
 
-MaNGA dark matter analysis and fitting pipeline.
+## Repository Status
 
-The current official implementation lives in the `src/` package. The official
-command-line entry point is `manga`, with `python -m src` as an equivalent
-module entry point.
+This is a scientific research codebase. The public interface is the `manga` CLI and the modules under `src/`. Legacy scripts are kept only for reference and are not required for the documented workflow.
 
-## Development Environment
+## Documentation
 
-The documented development environment is Windows + Anaconda:
+- [Documentation home](docs/index.md)
+- [Data processing pipeline](docs/Data-Processing-Pipeline.md)
+- [MCMC guide for Bayesian inference](docs/mcmc/how-and-why-to-use-mcmc.md)
+- [Research option: inner rotation-curve shapes](docs/future/manga-dm-rc-shapes.md)
+
+## Installation
+
+The documented environment is Windows with Anaconda. Python 3.11 or newer is required.
 
 ```bash
 conda create -c conda-forge -n manga-dm python=3.12
@@ -39,70 +47,104 @@ conda install -c conda-forge matplotlib seaborn xarray-einstats numba
 conda install -c conda-forge m2w64-toolchain libpython
 ```
 
-Install the remaining packages with pip:
+Install remaining packages and the local package:
 
 ```bash
 pip install ppxf spectral_cube sdss-access
-```
-
-Install the package in editable mode:
-
-```bash
 pip install -e .
 ```
 
-## CLI Usage
+## Quick Start
+
+```bash
+manga --help
+manga select --download
+manga stage1 --ifu test --nfw
+manga merge --ifu-file data/plateifus.txt
+manga stage2 --fit --quality-cut recommended
+manga stage2 --diagnose --quality-cut recommended
+```
+
+The equivalent module entry point is:
 
 ```bash
 python -m src --help
-manga --help
+```
+
+## Workflow
+
+| Step | Command | Output |
+|---|---|---|
+| Select targets | `manga select --download` | `data/plateifus.txt` and downloaded MaNGA products |
+| Fit one or more galaxies | `manga stage1 --ifu test --nfw` | rotation-curve rows and NFW posterior files |
+| Merge samples | `manga merge --ifu-file data/plateifus.txt` | merged posterior NetCDF |
+| Fit population relation | `manga stage2 --fit --quality-cut recommended` | population `M200-c` fit products |
+| Run diagnostics | `manga stage2 --diagnose --quality-cut recommended` | PSIS diagnostics |
+| Generate figures | `manga figures --ifu 8994-12701 7977-3704` | analysis figures |
+| Draw subsamples | `manga sample --n 60` | robustness sample files |
+
+## CLI Reference
+
+```bash
 manga <subcommand> --help
 ```
 
-| Subcommand | Description |
+| Subcommand | Purpose |
 |---|---|
-| `manga select` | Select galaxy sample and optionally download data |
-| `manga stage1` | Single-galaxy RC + DM NFW fitting |
-| `manga stage2` | Population inference and PSIS diagnostics |
-| `manga figures` | Generate paper figures |
-| `manga merge` | Merge posterior sample files |
-| `manga sample` | Generate robustness sub-samples |
+| `select` | Select galaxy sample and optionally download data |
+| `stage1` | Run single-galaxy rotation-curve and NFW fitting |
+| `merge` | Merge per-galaxy posterior sample files |
+| `stage2` | Run population inference and diagnostics |
+| `figures` | Generate analysis figures |
+| `sample` | Generate robustness subsamples |
 
-The installed `manga` command and `python -m src` run the current `src/`
-package.
+Global options include `--config`, `--data-dir`, `--result-dir`, and `--verbose`.
 
-## Typical Workflow
+## Configuration
 
-```bash
-# 1. Select galaxies by inclination and download data
-manga select --download
+Runtime configuration is resolved through `src.config.settings`. Prefer CLI overrides or the supported `config.toml` lookup path instead of hard-coding local directories.
 
-# 2. Stage 1: fit rotation curve + NFW profile for the test set
-manga stage1 --ifu test --nfw
+Common defaults:
 
-# 3. Stage 1: full sample from plateifus.txt
-manga stage1 --ifu all --nfw --n-cores 8
+| Purpose | Default |
+|---|---|
+| Data root | `data/` |
+| Result directory | `data/results/` |
+| Selected IFU list | `data/plateifus.txt` |
+| Rotation-curve table | `rc_param.csv` |
+| NFW parameter table | `nfw_param_cm200.csv` |
+| Merged posterior samples | `nfw_param_cm200_samples.nc` |
 
-# 4. Merge posterior samples after Stage 1 completes
-manga merge --ifu-file data/plateifus.txt
+## Python Modules
 
-# 5. Stage 2: population-level c-M200 relation
-manga stage2 --fit --quality-cut recommended
+The package is organized by responsibility:
 
-# 6. Stage 2 diagnostics after a fit
-manga stage2 --diagnose --quality-cut recommended
-
-# 7. Generate figures for specific galaxies
-manga figures --ifu 8994-12701 7977-3704
-
-# 8. Generate robustness sub-samples
-manga sample --n 60
+```text
+src/
+  __main__.py    # python -m src -> CLI
+  cli/           # argparse dispatch only
+  config/        # settings and constants
+  data/          # catalogs, FITS/MAPS access, result I/O
+  models/        # rotation-curve, NFW, and population models
+  pipeline/      # workflow orchestration
+  stats/         # statistical utilities
+  viz/           # figure generation and plotting helpers
 ```
 
-## Smoke Tests Without Local Science Data
+Useful imports:
 
-When FITS files and Stage 1/2 outputs are not available, command dispatch and
-imports can still be checked:
+```python
+from src.config import settings
+from src.pipeline.selection import select_and_download
+from src.pipeline.stage1 import run_stage1
+from src.pipeline.stage2 import run_stage2, merge_samples
+from src.models.rotation_curve import RotCurve
+from src.models.dm_nfw import DmNfw
+```
+
+## Smoke Checks
+
+These checks do not require local FITS data:
 
 ```bash
 python -m src --help
@@ -113,54 +155,5 @@ manga stage2 --help
 manga figures --help
 manga merge --help
 manga sample --help
-
 python -m unittest discover -v
-```
-
-## Python API
-
-```python
-# Configuration
-from src.config import settings
-print(settings.data_dir)
-print(settings.result_dir)
-
-# Constants
-from src.config.constants import H0_PHYS, COLOR_V_STAR
-
-# Data access
-from src.data.catalog import DrpallUtil, get_plateifu_list
-from src.data.fits import FitsUtil
-from src.data.maps import MapsUtil
-from src.data.firefly import FireflyUtil
-from src.data.results import store_params_file, merge_posterior_samples_file
-
-# Science models
-from src.models.rotation_curve import RotCurve
-from src.models.dm_nfw import DmNfw
-from src.models.population import fit_m200_c_mcmc
-
-# Statistical tools
-from src.stats.intervals import calc_eti_from_sample_matrix
-from src.stats.psis import compute_psis_importance_diagnostics
-
-# Pipeline orchestration
-from src.pipeline.stage1 import run_stage1
-from src.pipeline.stage2 import run_stage2
-from src.pipeline.selection import select_and_download
-```
-
-## Package Structure
-
-```text
-src/
-  __main__.py               # python -m src -> CLI
-  cli/                      # argparse dispatch layer
-  config/                   # settings and constants
-  data/                     # data loading, download, and result I/O
-  models/                   # scientific model implementations
-  pipeline/                 # workflow orchestration
-  stats/                    # model-independent statistical utilities
-  viz/                      # visualization helpers and paper figures
-docs/                       # project notes and technical articles
 ```
