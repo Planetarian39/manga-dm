@@ -9,7 +9,14 @@ from contextlib import redirect_stdout
 from io import StringIO
 from pathlib import Path
 
+import numpy as np
+import xarray as xr
+
 from src.config import settings as settings_module
+from src.data.results import (
+    merge_posterior_samples_file,
+    store_posterior_samples_file,
+)
 
 
 class Stage2PipelineTests(unittest.TestCase):
@@ -29,12 +36,16 @@ class Stage2PipelineTests(unittest.TestCase):
             sys.modules[name] = original
 
     def test_merge_samples_uses_current_results_module_not_legacy_m200(self) -> None:
-        calls: list[tuple[str, Path]] = []
+        calls: list[tuple[str, Path, set[str] | None]] = []
 
         fake_results = types.ModuleType("src.data.results")
 
-        def fake_merge_posterior_samples_file(filename: str, result_dir: str | Path):
-            calls.append((filename, Path(result_dir)))
+        def fake_merge_posterior_samples_file(
+            filename: str,
+            result_dir: str | Path,
+            plate_ifus: set[str] | None = None,
+        ):
+            calls.append((filename, Path(result_dir), plate_ifus))
             return Path(result_dir) / filename
 
         fake_results.load_posterior_sample_map = lambda *args, **kwargs: {}
@@ -54,8 +65,10 @@ class Stage2PipelineTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             settings = settings_module.init_settings(result_dir=tmp)
             stage2 = importlib.import_module("src.pipeline.stage2")
+            ifu_file = Path(tmp) / "plateifus.txt"
+            ifu_file.write_text("1000-10001\n", encoding="utf-8")
 
-            stage2.merge_samples()
+            stage2.merge_samples(ifu_file=ifu_file)
 
         self.assertEqual(
             calls,
@@ -63,9 +76,48 @@ class Stage2PipelineTests(unittest.TestCase):
                 (
                     settings.nfw_param_cm200_sample_filename,
                     settings.result_dir,
+                    {"1000-10001"},
                 )
             ],
         )
+
+    def test_merge_samples_rejects_missing_ifu_file(self) -> None:
+        sys.modules.pop("src.pipeline.stage2", None)
+        stage2 = importlib.import_module("src.pipeline.stage2")
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(FileNotFoundError):
+                stage2.merge_samples(
+                    ifu_file=Path(tmp) / "missing.txt",
+                    result_dir_override=tmp,
+                )
+
+    def test_merge_posterior_samples_file_filters_plate_ifus(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            filename = "samples.nc"
+            samples = {
+                "log10_M200_samples": np.array([12.0, 12.1]),
+                "log10_c_samples": np.array([0.8, 0.9]),
+            }
+            store_posterior_samples_file(
+                "1000-10001", samples, filename, tmp
+            )
+            store_posterior_samples_file(
+                "2000-20002", samples, filename, tmp
+            )
+
+            merged = merge_posterior_samples_file(
+                filename,
+                tmp,
+                plate_ifus={"1000-10001"},
+            )
+
+            self.assertIsNotNone(merged)
+            with xr.open_dataset(merged) as dataset:
+                self.assertEqual(
+                    dataset.coords["plate_ifu"].values.tolist(),
+                    ["1000-10001"],
+                )
 
     def test_run_stage2_fit_uses_current_population_entrypoint_not_legacy_m200(self) -> None:
         calls: list[dict[str, object]] = []

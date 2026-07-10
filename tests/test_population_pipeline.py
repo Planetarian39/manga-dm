@@ -8,6 +8,7 @@ import numpy as np
 
 from src.config import settings as settings_module
 import src.pipeline.population as population
+from src.stats.psis import compute_psis_importance_diagnostics
 
 
 class PopulationPipelineTests(unittest.TestCase):
@@ -161,6 +162,46 @@ class PopulationPipelineTests(unittest.TestCase):
         self.assertEqual(result, {"n_bad_k": 0, "n_warn_k": 0})
         self.assertEqual(calls[0]["fit_results"]["likelihood_mode"], "samples")
         self.assertEqual(calls[0]["plot_suffix"], "_all")
+
+    def test_psis_diagnostics_use_population_degrees_of_freedom(self) -> None:
+        m_samples = np.array(
+            [[10.5, 11.0, 11.4, 11.8, 12.0, 12.2, 12.6, 13.0, 13.5]]
+        )
+        c_samples = np.array(
+            [[0.2, 0.5, 0.7, 0.85, 0.9, 0.95, 1.1, 1.4, 1.8]]
+        )
+        common = {
+            "log10_M200_posterior_samples": m_samples,
+            "log10_c_posterior_samples": c_samples,
+            "log10_M200_prior_mu": np.array([12.0]),
+            "log10_M200_prior_sigma": np.array([1.0]),
+            "log10_M200_prior_lower": np.array([10.0]),
+            "log10_M200_prior_upper": np.array([14.0]),
+            "log10_c_prior_mu": np.array([0.9]),
+            "log10_c_prior_sigma": np.array([0.6]),
+            "save_plots": False,
+        }
+        fit_results = {
+            "likelihood_mode": "samples",
+            "log10_c0_median": 0.9,
+            "alpha_median": -0.1,
+            "sigma_int_median": 0.2,
+            "M200_mu_median": 12.0,
+            "M200_sigma_median": 0.5,
+        }
+
+        heavy_tailed = compute_psis_importance_diagnostics(
+            **common,
+            fit_results={**fit_results, "nu_pop_median": 3.0},
+        )
+        near_normal = compute_psis_importance_diagnostics(
+            **common,
+            fit_results={**fit_results, "nu_pop_median": 100.0},
+        )
+
+        self.assertFalse(
+            np.allclose(heavy_tailed["ess"], near_normal["ess"])
+        )
 
 
 if __name__ == "__main__":

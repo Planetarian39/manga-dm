@@ -143,7 +143,7 @@ def compute_psis_importance_diagnostics(
         Returns None if inputs are insufficient.
     """
     # Import is deferred to avoid hard dependency on scipy before it's needed
-    from scipy.stats import norm, truncnorm
+    from scipy.stats import norm, t, truncnorm
 
     if fit_results is None or fit_results.get("likelihood_mode") != "samples":
         return None
@@ -222,9 +222,17 @@ def compute_psis_importance_diagnostics(
 
         # Population-model conditional log-density at Φ* (posterior median)
         mu_c_given_m = log10_c0 + alpha * (m_samps - log10_M_pivot)
-        log_p_pop = norm.logpdf(
-            c_samps, loc=mu_c_given_m, scale=sigma_int
-        ) + norm.logpdf(m_samps, loc=M200_mu, scale=M200_sigma)
+        log_p_pop = t.logpdf(
+            c_samps,
+            df=nu_pop,
+            loc=mu_c_given_m,
+            scale=sigma_int,
+        ) + t.logpdf(
+            m_samps,
+            df=nu_pop,
+            loc=M200_mu,
+            scale=M200_sigma,
+        )
 
         log_w = log_p_pop - log_p_stage1
         log_w -= log_w.max()

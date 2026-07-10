@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import ast
 import os
+from contextlib import nullcontext
 from pathlib import Path
 
 import numpy as np
@@ -29,6 +30,8 @@ def store_params_file(
     fit_parameters: dict,
     filename: str,
     result_dir: Path | str,
+    *,
+    write_lock=None,
 ) -> None:
     """Store *fit_parameters* dict for *plate_ifu* in a CSV file.
 
@@ -45,24 +48,32 @@ def store_params_file(
     """
     output_file = Path(result_dir) / filename
 
-    if output_file.exists():
-        try:
-            all_fit_parameters = pd.read_csv(
-                output_file, index_col=0
-            ).to_dict(orient="index")
-        except pd.errors.EmptyDataError:
+    with write_lock if write_lock is not None else nullcontext():
+        if output_file.exists():
+            try:
+                all_fit_parameters = pd.read_csv(
+                    output_file, index_col=0
+                ).to_dict(orient="index")
+            except pd.errors.EmptyDataError:
+                all_fit_parameters = {}
+        else:
             all_fit_parameters = {}
-    else:
-        all_fit_parameters = {}
 
-    if plate_ifu in all_fit_parameters:
-        del all_fit_parameters[plate_ifu]
+        if plate_ifu in all_fit_parameters:
+            del all_fit_parameters[plate_ifu]
 
-    all_fit_parameters[plate_ifu] = fit_parameters
+        all_fit_parameters[plate_ifu] = fit_parameters
 
-    df = pd.DataFrame.from_dict(all_fit_parameters, orient="index")
-    df.rename_axis("PLATE_IFU", inplace=True)
-    df.to_csv(output_file)
+        df = pd.DataFrame.from_dict(all_fit_parameters, orient="index")
+        df.rename_axis("PLATE_IFU", inplace=True)
+        temp_output_file = output_file.with_name(
+            f".{output_file.name}.{os.getpid()}.tmp"
+        )
+        try:
+            df.to_csv(temp_output_file)
+            os.replace(temp_output_file, output_file)
+        finally:
+            temp_output_file.unlink(missing_ok=True)
 
 
 def get_params_file(
@@ -88,6 +99,9 @@ def get_params_file(
 def get_processed_plate_ifus(
     filename: str,
     result_dir: Path | str,
+    *,
+    successful_only: bool = False,
+    required_sample_filename: str | None = None,
 ) -> set[str]:
     """Return the set of plate-IFU ids already present in the CSV."""
     output_file = Path(result_dir) / filename
@@ -99,7 +113,22 @@ def get_processed_plate_ifus(
     except pd.errors.EmptyDataError:
         return set()
 
-    return {str(idx) for idx in df.index.tolist()}
+    if successful_only:
+        if "result" not in df.columns:
+            return set()
+        df = df[df["result"].astype(str).str.lower() == "success"]
+
+    processed = {str(idx) for idx in df.index.tolist()}
+    if required_sample_filename is not None:
+        sample_output = Path(result_dir) / required_sample_filename
+        processed = {
+            plate_ifu
+            for plate_ifu in processed
+            if _get_posterior_sample_output_path(
+                sample_output, plate_ifu
+            ).exists()
+        }
+    return processed
 
 
 def load_m200_c_result_table(
@@ -512,8 +541,9 @@ def load_posterior_sample_map(
 def merge_posterior_samples_file(
     filename: str,
     result_dir: Path | str,
+    plate_ifus: set[str] | None = None,
 ) -> Path | None:
-    """Merge all per-IFU sample files into a single NetCDF.
+    """Merge selected per-IFU sample files into a single NetCDF.
 
     Parameters
     ----------
@@ -522,6 +552,8 @@ def merge_posterior_samples_file(
     result_dir : Path or str
         Directory containing the per-IFU ``<plate>_<filename>`` files and
         where the merged result is written.
+    plate_ifus : set of str, optional
+        If provided, merge only these plate-IFU identifiers.
 
     Returns
     -------
@@ -547,6 +579,8 @@ def merge_posterior_samples_file(
             continue
         plate_ifu, log10_m200, log10_c = loaded
         if not _is_plate_ifu_like(plate_ifu):
+            continue
+        if plate_ifus is not None and plate_ifu not in plate_ifus:
             continue
         merged_rows.append((plate_ifu, log10_m200, log10_c))
 

@@ -35,6 +35,7 @@ class FitsUtil:
         self.drp_dir.mkdir(parents=True, exist_ok=True)
         self.dap_dir.mkdir(parents=True, exist_ok=True)
         self.images_dir.mkdir(parents=True, exist_ok=True)
+        self.firefly_dir.mkdir(parents=True, exist_ok=True)
 
     # ── File locators ─────────────────────────────────────────────────
 
@@ -51,10 +52,10 @@ class FitsUtil:
         filename = f"manga-{plate}-{ifu}-MAPS-HYB10-MILESHC-MASTARHC2.fits.gz"
         ret_path = self.dap_dir / filename
 
-        if ret_path.exists() and ret_path.with_suffix('.sha256').exists():
-            if not checksum:
-                return ret_path
+        if ret_path.exists() and not checksum:
+            return ret_path
 
+        if ret_path.exists() and ret_path.with_suffix('.sha256').exists():
             sha256_checksum = self._compute_sha256(ret_path)
             checksum_file = ret_path.with_suffix('.sha256')
             with open(checksum_file, 'r', encoding='utf-8') as cf:
@@ -111,7 +112,8 @@ class FitsUtil:
         ret_path = self.firefly_dir / filename
         if not ret_path.exists():
             print(f" Warning: firefly file {filename} need to be downloaded first.")
-            self.dl_firefly_mastar(filename)
+            if not self.dl_firefly_mastar(filename) or not ret_path.exists():
+                raise FileNotFoundError(f"Firefly file unavailable: {ret_path}")
         return ret_path
 
     def get_image_file(self, plateifu: str) -> Path:

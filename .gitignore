@@ -99,3 +99,6 @@ tmpclaude*
 docs/latex/*.pdf
 
 .codebase-memory/
+
+# local Codex review reports
+.review/

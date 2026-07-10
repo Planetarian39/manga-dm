@@ -55,6 +55,7 @@ def process_plate_ifu(
     r0_frac: float | None = None,
     m200_prior_dex: float | None = None,
     inc_prior_enable: bool | None = None,
+    write_lock=None,
 ) -> None:
     """Run Stage 1 for a single plate-IFU: RC fit + optional NFW DM fit.
 
@@ -129,7 +130,13 @@ def process_plate_ifu(
                 fit_params["quality_pass"] = False
                 fit_params["quality_fail_reasons"] = "fit_failed"
                 fit_params["quality_summary"] = "fit_failed_before_quality_gate"
-                store_params_file(plate_ifu, fit_params, rc_filename, result_dir)
+                store_params_file(
+                    plate_ifu,
+                    fit_params,
+                    rc_filename,
+                    result_dir,
+                    write_lock=write_lock,
+                )
             print(f"Fitting rotational velocity failed for {plate_ifu}")
             return
 
@@ -163,7 +170,13 @@ def process_plate_ifu(
             fit_params["Rmax_Rt_ratio"] = f"{quality_gate['rmax_rt_ratio']:.3f}"
             fit_params["quality_pass"] = bool(quality_gate["passed"])
             fit_params["quality_summary"] = quality_gate["summary"]
-        store_params_file(plate_ifu, fit_params, rc_filename, result_dir)
+        store_params_file(
+            plate_ifu,
+            fit_params,
+            rc_filename,
+            result_dir,
+            write_lock=write_lock,
+        )
 
         if not quality_gate["passed"]:
             fail_reason_text = "; ".join(quality_gate["fail_reasons"])
@@ -251,7 +264,13 @@ def process_plate_ifu(
             vel_param=dm_vel_param,
             radius_fit=radius_fit,
         )
-        store_params_file(plate_ifu, inf_params, nfw_filename, result_dir)
+        store_params_file(
+            plate_ifu,
+            inf_params,
+            nfw_filename,
+            result_dir,
+            write_lock=write_lock,
+        )
         store_posterior_samples_file(
             plate_ifu,
             posterior_samples,
@@ -399,6 +418,7 @@ def process_plate_ifu_worker(
     r0_frac: float | None = None,
     m200_prior_dex: float | None = None,
     inc_prior_enable: bool | None = None,
+    write_lock=None,
 ) -> None:
     """Multiprocessing worker wrapper."""
     process_plate_ifu(
@@ -409,6 +429,7 @@ def process_plate_ifu_worker(
         r0_frac=r0_frac,
         m200_prior_dex=m200_prior_dex,
         inc_prior_enable=inc_prior_enable,
+        write_lock=write_lock,
     )
 
 
@@ -440,7 +461,9 @@ def run_stage1(
     elif _is_plate_ifu_id(ifu):
         plate_ifus = [ifu]
     elif ifu.lower() == "all":
-        plate_ifus = get_plateifu_list(filepath=PLATES_FILENAME)
+        plate_ifus = get_plateifu_list(
+            filepath=settings.data_dir / PLATES_FILENAME
+        )
         if not plate_ifus:
             print("No plate-IFUs found. Use 'manga select --download' first.")
             return
@@ -454,7 +477,17 @@ def run_stage1(
         n_cores = getattr(settings, "n_cores", None) or 1
 
     # Filter already-processed
-    processed = get_processed_plate_ifus(settings.rc_param_filename, result_dir)
+    processed_filename = (
+        settings.nfw_param_cm200_filename if nfw else settings.rc_param_filename
+    )
+    processed = get_processed_plate_ifus(
+        processed_filename,
+        result_dir,
+        successful_only=True,
+        required_sample_filename=(
+            settings.nfw_param_cm200_sample_filename if nfw else None
+        ),
+    )
     todo = [p for p in plate_ifus if p not in processed]
     if not todo:
         print("All plate-IFUs already processed.")
@@ -463,16 +496,27 @@ def run_stage1(
     print(f"Processing {len(todo)} plate-IFUs with {n_cores} workers...")
 
     if n_cores > 1:
-        with multiprocessing.Pool(processes=n_cores) as pool:
-            args = [
-                (p, nfw, debug, result_dir_override, r0_frac, m200_prior_dex, inc_prior_enable)
-                for p in todo
-            ]
-            list(tqdm(
-                pool.starmap(process_plate_ifu_worker, args),
-                total=len(todo),
-                desc="Stage 1",
-            ))
+        with multiprocessing.Manager() as manager:
+            write_lock = manager.Lock()
+            with multiprocessing.Pool(processes=n_cores) as pool:
+                args = [
+                    (
+                        p,
+                        nfw,
+                        debug,
+                        result_dir_override,
+                        r0_frac,
+                        m200_prior_dex,
+                        inc_prior_enable,
+                        write_lock,
+                    )
+                    for p in todo
+                ]
+                list(tqdm(
+                    pool.starmap(process_plate_ifu_worker, args),
+                    total=len(todo),
+                    desc="Stage 1",
+                ))
     else:
         for plate_ifu in tqdm(todo, desc="Stage 1"):
             process_plate_ifu(

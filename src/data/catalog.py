@@ -262,7 +262,10 @@ class DrpallUtil:
 
 # ── Plate-IFU list utilities (consolidated from main.py and rc.py) ────────
 
-def get_plateifu_list(filepath: str | None = None, test: bool = False) -> list[str]:
+def get_plateifu_list(
+    filepath: str | Path | None = None,
+    test: bool = False,
+) -> list[str]:
     """Return a list of plate-IFU strings.
 
     If *test* is True, return the hardcoded TEST_PLATE_IFUS.
@@ -272,7 +275,7 @@ def get_plateifu_list(filepath: str | None = None, test: bool = False) -> list[s
         return list(TEST_PLATE_IFUS)
     path = Path(filepath) if filepath else Path(PLATES_FILENAME)
     if not path.exists():
-        return list(TEST_PLATE_IFUS)
+        return []
     with open(path, "r") as f:
         return [line.strip() for line in f if line.strip()]
 

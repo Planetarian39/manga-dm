@@ -1,13 +1,14 @@
 from __future__ import annotations
 
 import sys
+import tempfile
 import types
 import unittest
 import importlib
 from contextlib import redirect_stdout
 from io import StringIO
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import numpy as np
 
@@ -176,6 +177,7 @@ class Stage1PipelineTests(unittest.TestCase):
 
     def test_worker_delegates_to_current_process_function_not_legacy_main(self) -> None:
         calls: list[dict[str, object]] = []
+        write_lock = object()
 
         stage1 = self._import_stage1_with_fakes()
 
@@ -204,6 +206,7 @@ class Stage1PipelineTests(unittest.TestCase):
                     r0_frac=0.25,
                     m200_prior_dex=0.2,
                     inc_prior_enable=True,
+                    write_lock=write_lock,
                 )
 
         self.assertEqual(
@@ -217,9 +220,95 @@ class Stage1PipelineTests(unittest.TestCase):
                     "r0_frac": 0.25,
                     "m200_prior_dex": 0.2,
                     "inc_prior_enable": True,
+                    "write_lock": write_lock,
                 }
             ],
         )
+
+    def test_run_stage1_all_uses_configured_data_list(self) -> None:
+        stage1 = self._import_stage1_with_fakes()
+        get_plateifu_list = MagicMock(return_value=["1000-10001"])
+
+        with (
+            patch.object(stage1, "get_plateifu_list", get_plateifu_list),
+            patch.object(stage1, "get_processed_plate_ifus", return_value=set()),
+            patch.object(stage1, "process_plate_ifu"),
+            redirect_stdout(StringIO()),
+        ):
+            stage1.run_stage1(ifu="all", n_cores=1)
+
+        get_plateifu_list.assert_called_once_with(
+            filepath=stage1.settings.data_dir / stage1.PLATES_FILENAME
+        )
+
+    def test_run_stage1_nfw_uses_successful_nfw_samples_for_completion(self) -> None:
+        stage1 = self._import_stage1_with_fakes()
+
+        with tempfile.TemporaryDirectory() as tmp:
+            with (
+                patch.object(
+                    stage1,
+                    "get_processed_plate_ifus",
+                    return_value={"1000-10001"},
+                ) as get_processed,
+                patch.object(stage1, "process_plate_ifu") as process,
+                redirect_stdout(StringIO()),
+            ):
+                stage1.run_stage1(
+                    ifu="1000-10001",
+                    nfw=True,
+                    n_cores=1,
+                    result_dir_override=tmp,
+                )
+
+            get_processed.assert_called_once_with(
+                stage1.settings.nfw_param_cm200_filename,
+                stage1.settings.resolve_result_dir(tmp),
+                successful_only=True,
+                required_sample_filename=(
+                    stage1.settings.nfw_param_cm200_sample_filename
+                ),
+            )
+            process.assert_not_called()
+
+    def test_run_stage1_parallel_passes_one_lock_to_workers(self) -> None:
+        stage1 = self._import_stage1_with_fakes()
+        write_lock = object()
+        worker_args: list[tuple[object, ...]] = []
+
+        class FakeManager:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def Lock(self):
+                return write_lock
+
+        class FakePool:
+            def __init__(self, processes):
+                self.processes = processes
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def starmap(self, function, args):
+                worker_args.extend(args)
+                return [None] * len(args)
+
+        with (
+            patch.object(stage1, "get_processed_plate_ifus", return_value=set()),
+            patch.object(stage1.multiprocessing, "Manager", return_value=FakeManager()),
+            patch.object(stage1.multiprocessing, "Pool", FakePool),
+            redirect_stdout(StringIO()),
+        ):
+            stage1.run_stage1(ifu="1000-10001", nfw=True, n_cores=2)
+
+        self.assertIs(worker_args[0][-1], write_lock)
 
     def test_process_plate_ifu_uses_current_modules_for_rc_only(self) -> None:
         stored_rows: list[tuple[object, ...]] = []

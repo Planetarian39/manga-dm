@@ -100,7 +100,7 @@ DAP radii are converted from MaNGA `h^-1 kpc` to physical kpc using the configur
 
 ### Rotation-Curve Fit
 
-The default rotation-curve fit uses `lmfit` least squares. The intrinsic profile is:
+The default rotation-curve fit uses PyMC MCMC. The intrinsic profile is:
 
 ```text
 V_rot(r) = Vc * tanh(r / Rt) + s_out * r
@@ -112,7 +112,7 @@ The projected velocity model is:
 V_obs = Vsys + V_rot(r) * sin(i) * cos(phi - phi_delta)
 ```
 
-In the current `lmfit` path, inclination is fixed to the photometric inclination and `phi_delta` is fixed at zero. The fit solves for `Vc`, `Rt`, `s_out`, and `Vsys`, then records RMSE, NRMSE, reduced chi-square, fitted parameters, and a clipped velocity map in `rc_param.csv`.
+The default MCMC path infers `Vc`, `Rt`, `s_out`, `Vsys`, intrinsic scatter, Student-t degrees of freedom, inclination, and `phi_delta`; the latter two use priors centered on the photometric geometry. It records posterior summaries, RMSE, NRMSE, reduced chi-square, posterior-predictive metrics, and a clipped velocity map in `rc_param.csv`. `RotCurve` retains an internal `lmfit` alternative with fixed inclination and `phi_delta`, but the current CLI does not select it.
 
 ### Rotation-Curve Quality Gate
 

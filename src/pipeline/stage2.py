@@ -8,6 +8,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from src.config.settings import settings
+from src.data.catalog import get_plateifu_list
 from src.data.results import merge_posterior_samples_file
 
 
@@ -61,6 +62,19 @@ def merge_samples(
     result_dir_override: str | Path | None = None,
 ) -> None:
     """Merge per-IFU posterior sample files into a single NetCDF."""
+    if ifu_file is None:
+        raise ValueError("ifu_file is required")
+    ifu_path = settings.resolve_input_path(ifu_file)
+    if not ifu_path.exists():
+        raise FileNotFoundError(f"plate-IFU list not found: {ifu_path}")
+    plate_ifus = set(get_plateifu_list(ifu_path))
+    if not plate_ifus:
+        raise ValueError(f"plate-IFU list is empty: {ifu_path}")
+
     result_dir = settings.resolve_result_dir(result_dir_override)
     filename = settings.nfw_param_cm200_sample_filename
-    merge_posterior_samples_file(filename=filename, result_dir=result_dir)
+    merge_posterior_samples_file(
+        filename=filename,
+        result_dir=result_dir,
+        plate_ifus=plate_ifus,
+    )
