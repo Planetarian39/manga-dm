@@ -103,3 +103,4 @@ docs/latex/*.pdf
 # local Codex review reports
 .review/
 project
+.worktrees/
