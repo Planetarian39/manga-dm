@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "description": "Per-galaxy descriptive posterior summaries for method demonstration only; these values are not an aggregate scientific result.",
+  "cases": [
+    {
+      "galaxyId": "11743-9102",
+      "sampleCount": 4000,
+      "log10M200": {
+        "q16": 12.4232,
+        "median": 12.5738,
+        "q84": 12.7172
+      },
+      "log10C": {
+        "q16": 0.9013,
+        "median": 0.9814,
+        "q84": 1.0584
+      },
+      "correlation": -0.6888
+    },
+    {
+      "galaxyId": "7977-3704",
+      "sampleCount": 4000,
+      "log10M200": {
+        "q16": 11.7272,
+        "median": 11.8066,
+        "q84": 11.894
+      },
+      "log10C": {
+        "q16": 1.3836,
+        "median": 1.4372,
+        "q84": 1.4898
+      },
+      "correlation": -0.7291
+    },
+    {
+      "galaxyId": "8994-12701",
+      "sampleCount": 4000,
+      "log10M200": {
+        "q16": 12.0766,
+        "median": 12.1378,
+        "q84": 12.2084
+      },
+      "log10C": {
+        "q16": 1.2989,
+        "median": 1.3418,
+        "q84": 1.3807
+      },
+      "correlation": -0.7907
+    },
+    {
+      "galaxyId": "9493-6101",
+      "sampleCount": 4000,
+      "log10M200": {
+        "q16": 13.3064,
+        "median": 13.4547,
+        "q84": 13.6046
+      },
+      "log10C": {
+        "q16": 0.8316,
+        "median": 0.8928,
+        "q84": 0.9553
+      },
+      "correlation": -0.898
+    }
+  ]
+}

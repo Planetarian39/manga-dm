@@ -12,6 +12,9 @@ build/
 develop-eggs/
 dist/
 downloads/
+!docs/public/downloads/
+!docs/public/downloads/posteriors/
+!docs/public/downloads/posteriors/*.nc
 eggs/
 .eggs/
 lib/
@@ -102,5 +105,8 @@ docs/latex/*.pdf
 
 # local Codex review reports
 .review/
-project
+/project/
 .worktrees/
+node_modules/
+docs/.vitepress/cache/
+docs/.vitepress/dist/

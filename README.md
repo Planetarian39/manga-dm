@@ -1,62 +1,43 @@
 # MaNGA Dark Matter
 
-`manga-dm` is a research pipeline for MaNGA dark-matter analysis. It selects MaNGA galaxies, fits gas rotation curves, runs single-galaxy NFW halo inference, merges posterior samples, and fits a population-level halo mass-concentration relation.
-
-The current implementation lives in `src/` and is exposed through the `manga` command-line interface.
-
-## What It Does
-
-- Selects MaNGA DR17 galaxy samples and optionally downloads required data products.
-- Fits per-galaxy rotation curves from H-alpha velocity maps.
-- Runs Bayesian NFW halo inference with PyMC for galaxies that pass quality gates.
-- Merges per-galaxy posterior samples into a common NetCDF product.
-- Fits and diagnoses the population-level `M200-c` relation.
-- Generates figures and robustness subsamples for analysis workflows.
-
-## Repository Status
-
-This is a scientific research codebase. The public interface is the `manga` CLI and the modules under `src/`. Legacy scripts are kept only for reference and are not required for the documented workflow.
+`manga-dm` is a Python research pipeline for MaNGA gas-kinematic screening, empirical rotation curves, single-galaxy NFW inference, posterior-sample management, and population-model diagnostics. The public interface is the `manga` CLI; scientific modules live under `src/`.
 
 ## Documentation
 
-- [Documentation home](docs/index.md)
-- [Data processing pipeline](docs/Data-Processing-Pipeline.md)
-- [MCMC guide for Bayesian inference](docs/mcmc/how-and-why-to-use-mcmc.md)
-- [Research option: inner rotation-curve shapes](docs/future/manga-dm-rc-shapes.md)
+- [Documentation home](https://planetarian39.github.io/manga-dm/)
+- [Quick start](https://planetarian39.github.io/manga-dm/run/cli-workflow.html)
+- [Method overview](https://planetarian39.github.io/manga-dm/methods/)
+- [11743-9102 case study](https://planetarian39.github.io/manga-dm/case-studies/11743-9102.html)
+
+The site presents methods, implementation status, MCMC background, and four allowlisted single-galaxy examples. Unpublished aggregate findings, discussion, conclusions, paper sources, and full-sample products are intentionally excluded.
+
+## Pipeline
+
+```text
+MaNGA products
+  → sample and kinematic screening
+  → empirical rotation-curve fit
+  → single-galaxy stellar + NFW inference
+  → posterior-sample merge
+  → population fit and diagnostics
+```
 
 ## Installation
 
-The documented environment is Windows with Anaconda. Python 3.11 or newer is required.
+The documented development environment is Windows with Anaconda and Python 3.11 or newer.
 
-```bash
+```powershell
 conda create -c conda-forge -n manga-dm python=3.12
 conda activate manga-dm
-```
-
-Install the core scientific stack with conda:
-
-```bash
-conda install -c conda-forge nomkl numpy scipy lmfit
-conda install -c conda-forge pytensor pymc arviz nutpie dm-tree
-conda install -c conda-forge jax jaxlib
-conda install -c conda-forge pandas pytz h5py pyarrow fsspec s3fs bottleneck certifi tqdm mpmath jplephem beautifulsoup4 html5lib bleach
-conda install -c conda-forge ipython jupyter dask
-conda install -c conda-forge astropy astroquery reproject asdf-astropy
-conda install -c conda-forge pvextractor
-conda install -c conda-forge matplotlib seaborn xarray-einstats numba
-conda install -c conda-forge m2w64-toolchain libpython
-```
-
-Install remaining packages and the local package:
-
-```bash
-pip install ppxf spectral_cube sdss-access
+conda install -c conda-forge numpy scipy pandas xarray matplotlib astropy pymc arviz lmfit
 pip install -e .
 ```
 
-## Quick Start
+See the [installation guide](https://planetarian39.github.io/manga-dm/run/installation.html) for environment notes and troubleshooting.
 
-```bash
+## Quick start
+
+```powershell
 manga --help
 manga select --download
 manga stage1 --ifu test --nfw
@@ -65,95 +46,36 @@ manga stage2 --fit --quality-cut recommended
 manga stage2 --diagnose --quality-cut recommended
 ```
 
-The equivalent module entry point is:
+The equivalent module entry point is `python -m src`.
 
-```bash
-python -m src --help
-```
+> [!IMPORTANT]
+> Current fallback thresholds and the default Stage 2 path are not a versioned finalized-paper profile. See the [implementation-status page](https://planetarian39.github.io/manga-dm/project/implementation-status.html) before making reproducibility claims.
 
-## Workflow
+## Repository layout
 
-| Step | Command | Output |
-|---|---|---|
-| Select targets | `manga select --download` | `data/plateifus.txt` and downloaded MaNGA products |
-| Fit one or more galaxies | `manga stage1 --ifu test --nfw` | rotation-curve rows and NFW posterior files |
-| Merge samples | `manga merge --ifu-file data/plateifus.txt` | merged posterior NetCDF |
-| Fit population relation | `manga stage2 --fit --quality-cut recommended` | population `M200-c` fit products |
-| Run diagnostics | `manga stage2 --diagnose --quality-cut recommended` | PSIS diagnostics |
-| Generate figures | `manga figures --ifu 8994-12701 7977-3704` | analysis figures |
-| Draw subsamples | `manga sample --n 60` | robustness sample files |
-
-## CLI Reference
-
-```bash
-manga <subcommand> --help
-```
-
-| Subcommand | Purpose |
+| Path | Responsibility |
 |---|---|
-| `select` | Select galaxy sample and optionally download data |
-| `stage1` | Run single-galaxy rotation-curve and NFW fitting |
-| `merge` | Merge per-galaxy posterior sample files |
-| `stage2` | Run population inference and diagnostics |
-| `figures` | Generate analysis figures |
-| `sample` | Generate robustness subsamples |
+| `src/cli/` | CLI parsing and dispatch |
+| `src/config/` | Settings, constants, and path resolution |
+| `src/data/` | Catalog, download, result, and posterior I/O |
+| `src/models/` | Rotation-curve, NFW, and population models |
+| `src/pipeline/` | Workflow orchestration |
+| `src/stats/` | Statistical utilities and diagnostics |
+| `src/viz/` | Figures and visual diagnostics |
+| `docs/` | VitePress source and curated public assets |
+| `tests/` | Python and documentation checks |
 
-Global options include `--config`, `--data-dir`, `--result-dir`, and `--verbose`.
+## Documentation development
 
-## Configuration
-
-Runtime configuration is resolved through `src.config.settings`. Prefer CLI overrides or the supported `config.toml` lookup path instead of hard-coding local directories.
-
-Common defaults:
-
-| Purpose | Default |
-|---|---|
-| Data root | `data/` |
-| Result directory | `data/results/` |
-| Selected IFU list | `data/plateifus.txt` |
-| Rotation-curve table | `rc_param.csv` |
-| NFW parameter table | `nfw_param_cm200.csv` |
-| Merged posterior samples | `nfw_param_cm200_samples.nc` |
-
-## Python Modules
-
-The package is organized by responsibility:
-
-```text
-src/
-  __main__.py    # python -m src -> CLI
-  cli/           # argparse dispatch only
-  config/        # settings and constants
-  data/          # catalogs, FITS/MAPS access, result I/O
-  models/        # rotation-curve, NFW, and population models
-  pipeline/      # workflow orchestration
-  stats/         # statistical utilities
-  viz/           # figure generation and plotting helpers
+```powershell
+npm ci
+npm run docs:dev
+npm run docs:check
+npm run docs:build
 ```
 
-Useful imports:
+GitHub Pages deployment uses `.github/workflows/deploy-docs.yml` and the official Pages artifact/deploy flow. The repository Pages source must be configured as **GitHub Actions**.
 
-```python
-from src.config import settings
-from src.pipeline.selection import select_and_download
-from src.pipeline.stage1 import run_stage1
-from src.pipeline.stage2 import run_stage2, merge_samples
-from src.models.rotation_curve import RotCurve
-from src.models.dm_nfw import DmNfw
-```
+## License
 
-## Smoke Checks
-
-These checks do not require local FITS data:
-
-```bash
-python -m src --help
-manga --help
-manga select --help
-manga stage1 --help
-manga stage2 --help
-manga figures --help
-manga merge --help
-manga sample --help
-python -m unittest discover -v
-```
+See [LICENSE](LICENSE).

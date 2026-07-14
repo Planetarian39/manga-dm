@@ -1,0 +1,18 @@
+{
+  "name": "manga-dm-documentation",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "20.x"
+  },
+  "scripts": {
+    "docs:dev": "vitepress docs",
+    "docs:build": "npm run docs:check && vitepress build docs && node scripts/check-built-docs.mjs",
+    "docs:preview": "vitepress preview docs --host 127.0.0.1",
+    "docs:check": "node --test tests/docs-check.test.mjs tests/built-docs-check.test.mjs && node scripts/check-docs.mjs"
+  },
+  "devDependencies": {
+    "markdown-it-mathjax3": "^4.3.2",
+    "vitepress": "^1.6.4"
+  }
+}

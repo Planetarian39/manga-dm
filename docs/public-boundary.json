@@ -1,0 +1,62 @@
+{
+  "allowedGalaxyIds": [
+    "11743-9102",
+    "8994-12701",
+    "7977-3704",
+    "9493-6101"
+  ],
+  "requiredPages": [
+    "index.md",
+    "overview/project-overview.md",
+    "methods/index.md",
+    "methods/data-and-selection.md",
+    "methods/empirical-rotation-curves.md",
+    "methods/single-galaxy-nfw.md",
+    "methods/population-model.md",
+    "methods/diagnostics-and-quality-gates.md",
+    "case-studies/index.md",
+    "case-studies/11743-9102.md",
+    "case-studies/supporting-cases.md",
+    "case-studies/downloads.md",
+    "run/index.md",
+    "run/installation.md",
+    "run/cli-workflow.md",
+    "run/configuration.md",
+    "run/inputs-and-outputs.md",
+    "background/mcmc/index.md",
+    "background/mcmc/bayesian-foundations.md",
+    "background/mcmc/priors-and-data.md",
+    "background/mcmc/sampling-and-diagnostics.md",
+    "background/mcmc/optimization-vs-mcmc.md",
+    "background/mcmc/project-lessons.md",
+    "project/architecture.md",
+    "project/code-map.md",
+    "project/implementation-status.md",
+    "project/limitations.md",
+    "project/future-research.md"
+  ],
+  "forbiddenExtensions": [
+    ".tex",
+    ".bib",
+    ".fits",
+    ".fit",
+    ".zip",
+    ".pdf"
+  ],
+  "forbiddenPhrases": [
+    "Results and Discussion",
+    "Summary and Conclusions"
+  ],
+  "forbiddenPatterns": [
+    "\\b\\d{2,5}\\s+(?:galaxies|objects|systems|targets)\\b",
+    "\\b(?:we|this work)\\s+(?:find|found|show|demonstrate|conclude)\\b",
+    "\\bprimary contribution\\b",
+    "\\bstatistically significant\\b",
+    "\\bour (?:main )?(?:result|finding)s?\\b"
+  ],
+  "mcmcManifest": "public/meta/mcmc-migration.json",
+  "minimumMcmcHeadings": 58,
+  "minimumMcmcAssets": 6,
+  "provenanceManifest": "public/meta/case-study-provenance.json",
+  "summaryManifest": "public/meta/case-study-summaries.json"
+}

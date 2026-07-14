@@ -1,0 +1,13 @@
+:root {
+  --ledger-paper: #f4f0e6;
+  --ledger-paper-deep: #e9e2d3;
+  --ledger-paper-light: #fbf8f0;
+  --ledger-ink: #172b3c;
+  --ledger-muted: #5d6c74;
+  --ledger-navy: #102a43;
+  --ledger-gold: #b18a45;
+  --ledger-gold-text: #70500f;
+  --ledger-rust: #a14e37;
+  --ledger-night: #0b1723;
+  --ledger-night-soft: #102131;
+}

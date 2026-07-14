@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "sourceRepository": {
+    "name": "manga-dev",
+    "commit": "fa8ea5acc7ea5601655c4e41ff701945f14fa9a6"
+  },
+  "sourceArchive": "results-20260326-final.zip",
+  "sourceArchiveSha256": "e29aca5307ad6afa3c6549842762719b5dcd89188ac722161d2a2cf8227c8650",
+  "sourceThesis": "docs/latex/thesis.tex",
+  "sourceThesisSha256": "c8f8b3df050b3021ffcc6b7bd6cfe3bdf3725f0aa225bd5d871a60098b2adb4c",
+  "note": "Only allowlisted per-galaxy artifacts are copied. The aggregate source archive is not distributed.",
+  "artifacts": [
+    {
+      "galaxyId": "11743-9102",
+      "artifactType": "posterior_netcdf",
+      "sourcePath": "results/11743-9102_nfw_param_cm200_samples.nc",
+      "publicPath": "downloads/posteriors/11743-9102_nfw_param_cm200_samples.nc",
+      "sha256": "9e4b2153aded926a7e7ccc8e8b88135e2614f5c9516f3ba28d0d9be447e3cafb",
+      "bytes": 88196
+    },
+    {
+      "galaxyId": "11743-9102",
+      "artifactType": "nfw_fit_figure",
+      "sourcePath": "results/11743-9102_nfw_rv.png",
+      "publicPath": "assets/case-studies/11743-9102/nfw-fit.png",
+      "sha256": "5ac8637c88d82fe8ad1cf4c43ace436f03bb006bccf6024483aa30ded6f13b37",
+      "bytes": 56243
+    },
+    {
+      "galaxyId": "11743-9102",
+      "artifactType": "posterior_trace_figure",
+      "sourcePath": "docs/mcmc/figures/11743-9102_posterior_trace_plot.png",
+      "publicPath": "assets/case-studies/11743-9102/posterior-trace.png",
+      "sha256": "8a70061b2703c11eb7794ef36d3f51790edee363b4918417de8e04e0d6fe04be",
+      "bytes": 1822329
+    },
+    {
+      "galaxyId": "11743-9102",
+      "artifactType": "joint_posterior_figure",
+      "sourcePath": "docs/mcmc/figures/11743-9102_m200_c_comparison_pair.png",
+      "publicPath": "assets/case-studies/11743-9102/m200-c-joint-posterior.png",
+      "sha256": "8dbb2614192057c226765f72be213db67aec623cc2bf23528868c6a241007b45",
+      "bytes": 81750
+    },
+    {
+      "galaxyId": "11743-9102",
+      "artifactType": "prior_posterior_figure",
+      "sourcePath": "docs/mcmc/figures/11743-9102_m200_c_comparison_prior_posterior.png",
+      "publicPath": "assets/case-studies/11743-9102/m200-c-prior-posterior.png",
+      "sha256": "3194edd4c586eec1ffdbd8f1dbc50150cdac22e9935c82e2b213f6f78d223d82",
+      "bytes": 66515
+    },
+    {
+      "galaxyId": "8994-12701",
+      "artifactType": "posterior_netcdf",
+      "sourcePath": "results/8994-12701_nfw_param_cm200_samples.nc",
+      "publicPath": "downloads/posteriors/8994-12701_nfw_param_cm200_samples.nc",
+      "sha256": "b81f5cb4814c2145cdd448c0af0a3c0c1e6e3e44c308f28ef7ff4c145d7307c0",
+      "bytes": 88196
+    },
+    {
+      "galaxyId": "8994-12701",
+      "artifactType": "nfw_fit_figure",
+      "sourcePath": "results/8994-12701_nfw_rv.png",
+      "publicPath": "assets/case-studies/8994-12701/nfw-fit.png",
+      "sha256": "5ea3bfec74e07c06942727f7cbfd1465c85ef56bd5dbc1697b174f1fcc7b3fbb",
+      "bytes": 46457
+    },
+    {
+      "galaxyId": "7977-3704",
+      "artifactType": "posterior_netcdf",
+      "sourcePath": "results/7977-3704_nfw_param_cm200_samples.nc",
+      "publicPath": "downloads/posteriors/7977-3704_nfw_param_cm200_samples.nc",
+      "sha256": "fcb340382a00510b0acc4e576f11147c47a6236a5cbf358c2ae38a20244d9196",
+      "bytes": 88196
+    },
+    {
+      "galaxyId": "7977-3704",
+      "artifactType": "nfw_fit_figure",
+      "sourcePath": "results/7977-3704_nfw_rv.png",
+      "publicPath": "assets/case-studies/7977-3704/nfw-fit.png",
+      "sha256": "78b6560eb729624a54f55db502232e47538e909cd09028835ceb9afbf29fb0e9",
+      "bytes": 44969
+    },
+    {
+      "galaxyId": "9493-6101",
+      "artifactType": "posterior_netcdf",
+      "sourcePath": "results/9493-6101_nfw_param_cm200_samples.nc",
+      "publicPath": "downloads/posteriors/9493-6101_nfw_param_cm200_samples.nc",
+      "sha256": "4ca636a911518513780bb2ebc8ce0a5a099a3d0341f04be0e46b3839c8faca23",
+      "bytes": 88196
+    },
+    {
+      "galaxyId": "9493-6101",
+      "artifactType": "nfw_fit_figure",
+      "sourcePath": "results/9493-6101_nfw_rv.png",
+      "publicPath": "assets/case-studies/9493-6101/nfw-fit.png",
+      "sha256": "a328dabcc79a48d028f3ca2624ce05f0562e631287bb1fd03e656f5b21d65730",
+      "bytes": 51029
+    }
+  ]
+}

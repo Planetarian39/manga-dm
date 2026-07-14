@@ -1,6 +1,0 @@
-title: MaNGA Dark Matter
-description: Public documentation for the MaNGA dark-matter analysis pipeline
-markdown: kramdown
-theme: minima
-exclude:
-  - mcmc/gen_prior_figures.py

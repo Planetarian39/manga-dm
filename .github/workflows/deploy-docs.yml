@@ -1,0 +1,136 @@
+name: Deploy documentation
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - "scripts/check-docs.mjs"
+      - "scripts/check-built-docs.mjs"
+      - "scripts/docs/**"
+      - "tests/docs-check.test.mjs"
+      - "tests/built-docs-check.test.mjs"
+      - "tests/test_*.py"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/deploy-docs.yml"
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "scripts/check-docs.mjs"
+      - "scripts/check-built-docs.mjs"
+      - "scripts/docs/**"
+      - "tests/docs-check.test.mjs"
+      - "tests/built-docs-check.test.mjs"
+      - "tests/test_*.py"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/deploy-docs.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Configure GitHub Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v5
+
+      - name: Install documentation dependencies
+        run: npm ci
+
+      - name: Install Python documentation dependencies
+        run: python -m pip install numpy scipy matplotlib xarray h5py
+
+      - name: Test Python documentation tools
+        run: |
+          python -m unittest tests.test_extract_case_summaries -v
+          python -m unittest tests.test_docs_mcmc_figures -v
+
+      - name: Build VitePress site
+        run: npm run docs:build
+
+      - name: Upload GitHub Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/.vitepress/dist
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    outputs:
+      page_url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: Deploy GitHub Pages artifact
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  postdeploy:
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    needs: deploy
+    steps:
+      - name: Check representative public routes
+        shell: bash
+        env:
+          SITE_URL: ${{ needs.deploy.outputs.page_url }}
+        run: |
+          set -euo pipefail
+          root_html="${RUNNER_TEMP}/manga-dm-index.html"
+          curl --fail --location --retry 5 --retry-all-errors \
+            --output "${root_html}" "${SITE_URL}"
+          for path in \
+            'methods/single-galaxy-nfw.html' \
+            'case-studies/11743-9102.html' \
+            'run/cli-workflow.html' \
+            'background/mcmc/' \
+            'assets/case-studies/11743-9102/nfw-fit.png'; do
+            curl --fail --location --retry 5 --retry-all-errors \
+              --output /dev/null "${SITE_URL}${path}"
+          done
+
+          origin="${SITE_URL%/manga-dm/}"
+          css_path="$(grep -oE 'href="[^"]+\.css"' "${root_html}" | head -n 1 | cut -d '"' -f 2)"
+          js_path="$(grep -oE 'src="[^"]+\.js"' "${root_html}" | head -n 1 | cut -d '"' -f 2)"
+          test -n "${css_path}" && test -n "${js_path}"
+          curl --fail --location --retry 5 --retry-all-errors \
+            --output /dev/null "${origin}${css_path}"
+          curl --fail --location --retry 5 --retry-all-errors \
+            --output /dev/null "${origin}${js_path}"
+
+          posterior="${RUNNER_TEMP}/11743-9102.nc"
+          curl --fail --location --retry 5 --retry-all-errors \
+            --output "${posterior}" \
+            "${SITE_URL}downloads/posteriors/11743-9102_nfw_param_cm200_samples.nc"
+          test "$(wc -c < "${posterior}")" -eq 88196

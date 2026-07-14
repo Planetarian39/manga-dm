@@ -19,7 +19,9 @@ This file provides operating rules for future automated agents working in this r
 - `src/pipeline/`: workflow orchestration
 - `src/stats/`: statistical utilities
 - `src/viz/`: visualization
-- `docs/`: project notes and technical articles
+- `docs/`: VitePress public site source, project notes, and technical articles
+- `docs/.vitepress/`: public-site configuration and theme
+- `package.json` and `package-lock.json`: Node 20 documentation toolchain only; Python packaging remains in `pyproject.toml`
 - `project/superpowers/`: local Superpowers specifications and implementation plans
 - `var/`: runtime-generated content or temporary data, treated as volatile
 

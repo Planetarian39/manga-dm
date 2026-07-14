@@ -1,53 +1,53 @@
 ---
-title: MaNGA Dark Matter Documentation
+layout: home
+
+hero:
+  name: "Dark matter, read from rotation"
+  text: "A method-first guide to the MaNGA inference pipeline"
+  tagline: "Trace the path from emission-line velocity maps to single-galaxy NFW posteriors and a prior-corrected population model. Every scientific step is paired with its implementation status."
+  actions:
+    - theme: brand
+      text: Explore the methods
+      link: /methods/
+    - theme: alt
+      text: Inspect 11743-9102
+      link: /case-studies/11743-9102
+
+features:
+  - title: Finalized-paper method
+    details: Equations, priors, likelihoods, diagnostics, and quality gates are taken from the finalized method—not inferred from CLI defaults.
+  - title: Code-aware documentation
+    details: Each method page points to the current modules and labels known differences instead of hiding them.
+  - title: Reviewable case data
+    details: Four allowlisted single-galaxy posterior files and fit figures demonstrate the workflow without exposing aggregate findings.
 ---
 
-# MaNGA Dark Matter Documentation
+<WorkflowMap />
 
-`manga-dm` is a MaNGA dark-matter analysis pipeline for rotation-curve fitting, NFW halo inference, and population-level `M200-c` modeling.
+## Choose a reader path
 
-This documentation is organized for public review: start with the workflow overview, then use the method notes for Bayesian context and research direction.
+<div class="reader-paths">
 
-## Start Here
+### Understand the method
 
-| Page | Use it for |
-|---|---|
-| [Data Processing Pipeline](Data-Processing-Pipeline.md) | End-to-end CLI workflow, inputs, outputs, quality gates, and current limitations |
-| [How and Why to Use MCMC](mcmc/how-and-why-to-use-mcmc.md) | Practical Bayesian inference background and the MaNGA NFW example |
-| [Research Option: Inner Rotation-Curve Shapes](future/manga-dm-rc-shapes.md) | Future research direction for central dynamical concentration classes |
+Start with [data and selection](/methods/data-and-selection), then follow the inference chain through the [population likelihood](/methods/population-model).
 
-## Command-Line Workflow
+### Inspect a worked case
 
-```bash
-pip install -e .
-manga --help
-manga select --download
-manga stage1 --ifu test --nfw
-manga merge --ifu-file data/plateifus.txt
-manga stage2 --fit --quality-cut recommended
-manga stage2 --diagnose --quality-cut recommended
-```
+Use [11743-9102](/case-studies/11743-9102) to connect a fit figure, posterior geometry, diagnostics, and a complete per-galaxy NetCDF file.
 
-| Command | Purpose |
-|---|---|
-| `manga select` | Select MaNGA plate-IFU targets and optionally download data |
-| `manga stage1` | Fit per-galaxy rotation curves and optional NFW halos |
-| `manga merge` | Merge per-galaxy posterior samples into one NetCDF file |
-| `manga stage2` | Fit and diagnose the population-level `M200-c` relation |
-| `manga figures` | Generate analysis figures |
-| `manga sample` | Generate robustness subsamples |
+### Reproduce the pipeline
 
-## Project Layout
+Move from [installation](/run/installation) to the [CLI workflow](/run/cli-workflow), configuration, and output schemas.
 
-```text
-src/
-  cli/       command-line dispatch
-  config/    settings and constants
-  data/      catalog, FITS/MAPS, download, and result I/O
-  models/    rotation-curve, NFW, and population models
-  pipeline/  workflow orchestration
-  stats/     diagnostics and interval utilities
-  viz/       figures and plotting helpers
-```
+</div>
 
-The public entry point is `manga`; `python -m src` is equivalent for local development.
+::: warning Publication boundary
+This site documents methods and software. It intentionally excludes unpublished aggregate results, scientific interpretation, novelty claims, discussion, and conclusions. The four case studies are method demonstrations, not a population comparison.
+:::
+
+## A transparent implementation status
+
+The finalized paper and the current CLI are not identical in every default. The public method uses a 60° azimuthal cut, an exact predictive-HDI probability of 0.9545, the finalized quality equation, and a prior-corrected posterior-sample likelihood. The current implementation has known differences in each area.
+
+[Read the implementation status →](/project/implementation-status)
