@@ -20,7 +20,15 @@ This file provides operating rules for future automated agents working in this r
 - `src/stats/`: statistical utilities
 - `src/viz/`: visualization
 - `docs/`: project notes and technical articles
+- `project/superpowers/`: local Superpowers specifications and implementation plans
 - `var/`: runtime-generated content or temporary data, treated as volatile
+
+## Superpowers Document Location
+
+- Store all Superpowers-generated design specifications under `project/superpowers/specs/`
+- Store all Superpowers-generated implementation plans under `project/superpowers/plans/`
+- Do not create or retain Superpowers workflow documents under `docs/superpowers/`
+- Keep the existing `project/` ignore policy unless the user explicitly requests these local workflow documents to be versioned
 
 ## Key Entry Points
 
