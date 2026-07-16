@@ -2,6 +2,16 @@
 
 Four allowlisted galaxies demonstrate how the same method produces reviewable single-object artifacts. The examples are not a ranked set, a representative population, or evidence for an aggregate relation.
 
+## Galaxy anatomy context
+
+<ScienceFigure
+  src="/assets/home/milky-way-anatomy.jpg"
+  alt="NASA Milky Way Anatomy infographic showing the disk, bulge, spiral arms, stellar halo, and dark-matter halo."
+  caption="NASA's Milky Way Anatomy visualization provides general structural context for the disk, bulge, stellar halo, and dark-matter halo. It is contextual artwork, not a project result or a depiction of any case-study galaxy."
+  source="Image credit: NASA's Goddard Space Flight Center · NASA Scientific Visualization Studio"
+  source-href="https://svs.gsfc.nasa.gov/14935/"
+/>
+
 ## Deep walkthrough
 
 [11743-9102](/case-studies/11743-9102) connects the model, fit figure, posterior geometry, convergence checks, and complete posterior sample file in one narrative.

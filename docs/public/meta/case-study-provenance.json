@@ -28,6 +28,14 @@
     },
     {
       "galaxyId": "11743-9102",
+      "artifactType": "optical_reference_image",
+      "sourcePath": "data/images/manga-11743-9102.png",
+      "publicPath": "assets/case-studies/11743-9102/galaxy.png",
+      "sha256": "de821730410b8e08c15684f0c966f8c7bcfffabec60cfbb6649ef66891378e68",
+      "bytes": 274806
+    },
+    {
+      "galaxyId": "11743-9102",
       "artifactType": "posterior_trace_figure",
       "sourcePath": "docs/mcmc/figures/11743-9102_posterior_trace_plot.png",
       "publicPath": "assets/case-studies/11743-9102/posterior-trace.png",
@@ -67,6 +75,14 @@
       "bytes": 46457
     },
     {
+      "galaxyId": "8994-12701",
+      "artifactType": "optical_reference_image",
+      "sourcePath": "data/images/manga-8994-12701.png",
+      "publicPath": "assets/case-studies/8994-12701/galaxy.png",
+      "sha256": "47a70e61f67321b49f5f4f950b56a0ff2b0cc33a8595db15ab5d00875563eae0",
+      "bytes": 225861
+    },
+    {
       "galaxyId": "7977-3704",
       "artifactType": "posterior_netcdf",
       "sourcePath": "results/7977-3704_nfw_param_cm200_samples.nc",
@@ -83,6 +99,14 @@
       "bytes": 44969
     },
     {
+      "galaxyId": "7977-3704",
+      "artifactType": "optical_reference_image",
+      "sourcePath": "data/images/manga-7977-3704.png",
+      "publicPath": "assets/case-studies/7977-3704/galaxy.png",
+      "sha256": "021dec0f770114aa67f363bea230f32c6e758a65e86b515fb845b5434681d03a",
+      "bytes": 224193
+    },
+    {
       "galaxyId": "9493-6101",
       "artifactType": "posterior_netcdf",
       "sourcePath": "results/9493-6101_nfw_param_cm200_samples.nc",
@@ -97,6 +121,14 @@
       "publicPath": "assets/case-studies/9493-6101/nfw-fit.png",
       "sha256": "a328dabcc79a48d028f3ca2624ce05f0562e631287bb1fd03e656f5b21d65730",
       "bytes": 51029
+    },
+    {
+      "galaxyId": "9493-6101",
+      "artifactType": "optical_reference_image",
+      "sourcePath": "data/images/manga-9493-6101.png",
+      "publicPath": "assets/case-studies/9493-6101/galaxy.png",
+      "sha256": "3b7ae2f4a0ed6f04b5f8f62f82a41647e0ffa5e5f0ed13865cce8f9588481b56",
+      "bytes": 237596
     }
   ]
 }

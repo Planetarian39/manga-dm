@@ -29,6 +29,7 @@ function createFixture() {
       mcmcManifest: 'public/meta/mcmc-migration.json',
       minimumMcmcHeadings: 2,
       provenanceManifest: 'public/meta/case-study-provenance.json',
+      additionalPublicAssets: ['assets/home/declared-hero.png'],
     }),
   )
   write(root, 'docs/index.md', '# Home\n\n[Method](/methods/data-and-selection)\n')
@@ -53,6 +54,7 @@ function createFixture() {
     }),
   )
   write(root, 'docs/public/downloads/posteriors/11743-9102.nc', 'data')
+  write(root, 'docs/public/assets/home/declared-hero.png', 'hero')
   return root
 }
 
@@ -296,7 +298,8 @@ test('documentation toolchain ownership and Node runtime are recorded', () => {
   const packageJson = JSON.parse(readFileSync(join(repositoryRoot, 'package.json'), 'utf8'))
   assert.match(agents, /VitePress public site/)
   assert.match(agents, /package\.json/)
-  assert.match(packageJson.engines?.node ?? '', /^20/)
+  assert.equal(packageJson.engines?.node, '>=20')
+  assert.equal(packageJson.scripts?.['docs:dev'], 'vitepress dev docs')
 })
 
 test('MCMC project-lessons link targets the existing priors anchor', () => {

@@ -6,6 +6,7 @@ defineProps<{
   alt: string
   caption: string
   source?: string
+  sourceHref?: string
 }>()
 </script>
 
@@ -16,7 +17,10 @@ defineProps<{
     </a>
     <figcaption>
       <span>{{ caption }}</span>
-      <small v-if="source">{{ source }}</small>
+      <small v-if="source">
+        <a v-if="sourceHref" :href="sourceHref" target="_blank" rel="noopener">{{ source }}</a>
+        <template v-else>{{ source }}</template>
+      </small>
     </figcaption>
   </figure>
 </template>

@@ -279,6 +279,17 @@ if (mcmc) {
 }
 
 const publicRoot = resolve(docsRoot, 'public')
+for (const rawPath of policy.additionalPublicAssets ?? []) {
+  const publicPath = publicRelativePath(rawPath)
+  const target = resolve(publicRoot, publicPath)
+  if (!publicPath || target === publicRoot || !target.startsWith(`${publicRoot}${sep}`)) {
+    errors.push(`invalid additional public asset path: ${rawPath}`)
+    continue
+  }
+  expectedPublicPaths.add(publicPath)
+  if (!existsSync(target)) errors.push(`declared public asset is missing: ${publicPath}`)
+}
+
 for (const file of walk(publicRoot)) {
   const publicPath = relative(publicRoot, file).split(sep).join('/')
   if (!expectedPublicPaths.has(publicPath)) errors.push(`unexpected public file: ${publicPath}`)

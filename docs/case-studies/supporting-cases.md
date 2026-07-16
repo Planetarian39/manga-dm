@@ -5,6 +5,13 @@ The three cases below use the same artifact pattern: one finalized NFW fit figur
 ## 8994-12701
 
 <ScienceFigure
+  src="/assets/case-studies/8994-12701/galaxy.png"
+  alt="Optical image of MaNGA galaxy 8994-12701 with the hexagonal integral-field-unit footprint overlaid."
+  caption="Optical reference image for MaNGA 8994-12701. The magenta hexagon marks the integral-field-unit footprint used to collect the spatially resolved spectra."
+  source="Local source image data/images/manga-8994-12701.png"
+/>
+
+<ScienceFigure
   src="/assets/case-studies/8994-12701/nfw-fit.png"
   alt="Rotation-curve and NFW fit diagnostic for MaNGA 8994-12701."
   caption="Single-galaxy NFW fit output for 8994-12701. The panels expose fit structure and uncertainty; they do not establish a population trend."
@@ -23,6 +30,13 @@ The aligned draws have a Pearson correlation of -0.7907. This diagnostic describ
 ## 7977-3704
 
 <ScienceFigure
+  src="/assets/case-studies/7977-3704/galaxy.png"
+  alt="Optical image of MaNGA galaxy 7977-3704 with the hexagonal integral-field-unit footprint overlaid."
+  caption="Optical reference image for MaNGA 7977-3704. The magenta hexagon marks the integral-field-unit footprint used to collect the spatially resolved spectra."
+  source="Local source image data/images/manga-7977-3704.png"
+/>
+
+<ScienceFigure
   src="/assets/case-studies/7977-3704/nfw-fit.png"
   alt="Rotation-curve and NFW fit diagnostic for MaNGA 7977-3704."
   caption="Single-galaxy NFW fit output for 7977-3704, presented with the same method-facing fields as the other allowlisted cases."
@@ -39,6 +53,13 @@ The aligned draws have a Pearson correlation of -0.7291. The value is included t
 [Open the verified downloads list](/case-studies/downloads#files)
 
 ## 9493-6101
+
+<ScienceFigure
+  src="/assets/case-studies/9493-6101/galaxy.png"
+  alt="Optical image of MaNGA galaxy 9493-6101 with the hexagonal integral-field-unit footprint overlaid."
+  caption="Optical reference image for MaNGA 9493-6101. The magenta hexagon marks the integral-field-unit footprint used to collect the spatially resolved spectra."
+  source="Local source image data/images/manga-9493-6101.png"
+/>
 
 <ScienceFigure
   src="/assets/case-studies/9493-6101/nfw-fit.png"

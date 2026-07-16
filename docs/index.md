@@ -12,6 +12,9 @@ hero:
     - theme: alt
       text: Inspect 11743-9102
       link: /case-studies/11743-9102
+    - theme: alt
+      text: Image credits
+      link: /#image-credits
 
 features:
   - title: Finalized-paper method
@@ -21,6 +24,19 @@ features:
   - title: Reviewable case data
     details: Four allowlisted single-galaxy posterior files and fit figures demonstrate the workflow without exposing aggregate findings.
 ---
+
+<section id="image-credits" class="home-image-credits" aria-labelledby="image-credits-title">
+  <p class="section-kicker">Hero image credits</p>
+  <h2 id="image-credits-title">MaNGA telescope</h2>
+  <div class="home-image-credits__grid">
+    <p>
+      <strong>MaNGA telescope</strong><br>
+      Image credit: Sloan Digital Sky Survey (SDSS), CC BY.<br>
+      <a href="https://www.sdss4.org/wp-content/uploads/2021/05/manga_4.png">Original image</a>
+      · <a href="https://www.sdss.org/collaboration/image-use-policy/">SDSS image-use policy</a>
+    </p>
+  </div>
+</section>
 
 <WorkflowMap />
 
