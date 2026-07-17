@@ -1,16 +1,22 @@
 ---
 title: Methods
-description: Paper-aligned methodology for the MaNGA dark-matter inference pipeline.
+description: Manuscript-aligned methodology for the MaNGA dark-matter inference pipeline.
 ---
 
 # Methods
 
-This section documents the analysis model implemented by `manga-dm`, using the finalized paper methodology as the scientific reference. It explains how spatially resolved MaNGA gas kinematics are screened, modeled galaxy by galaxy, and propagated into a population model without reducing each posterior to a point estimate.
+This section documents the analysis model implemented by `manga-dm`, using the current manuscript methodology as the scientific reference. It explains how spatially resolved MaNGA gas kinematics are screened, modeled galaxy by galaxy, and propagated into a population model without reducing each posterior to a point estimate.
+
+::: info What this section demonstrates
+- **Research decision:** preserve the complete chain from observational screening to population inference.
+- **My implementation contribution:** I built the Bayesian galaxy-level and population-level workflow and connected it to diagnostics, provenance, and public documentation.
+- **Main limitation:** the current CLI contains the scientific components but does not yet expose one versioned manuscript-reproduction profile.
+:::
 
 The documentation deliberately separates two questions:
 
-1. **What method defines the finalized analysis?** The equations, priors, selection rules, sampler configuration, and diagnostic requirements on these pages answer this question.
-2. **What does the current public command line run by default?** Implementation notes identify places where today's defaults are not yet a paper-reproduction profile.
+1. **What method defines the manuscript analysis?** The equations, priors, selection rules, sampler configuration, and diagnostic requirements on these pages answer this question.
+2. **What does the current public command line run by default?** Implementation notes identify places where today's defaults are not yet a manuscript-reproduction profile.
 
 ## Analysis path
 
@@ -24,7 +30,7 @@ The model is intentionally conditional: it describes galaxies that pass the docu
 
 <MethodStatus status="paper">
 
-The finalized method uses a major-axis cut of 60°, predictive interval
+The manuscript method uses a major-axis cut of 60°, predictive interval
 probability `0.9545`, the full quality equation including R-hat and ESS,
 and a prior-corrected posterior-sample Stage 2 likelihood.
 
@@ -32,8 +38,8 @@ and a prior-corrected posterior-sample Stage 2 likelihood.
 
 <MethodStatus status="implementation">
 
-The public CLI has no single versioned paper profile. Current fallbacks use
-45°, `0.95`, non-paper `recommended`/`strict` presets, and a GMM Stage
+The public CLI has no single versioned manuscript profile. Current fallbacks use
+45°, `0.95`, non-manuscript `recommended`/`strict` presets, and a GMM Stage
 2 path by default.
 
 </MethodStatus>

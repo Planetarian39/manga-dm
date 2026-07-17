@@ -240,8 +240,43 @@ test('mobile home hero reserves space below the fixed navigation for its eyebrow
   const styles = readFileSync(join(repositoryRoot, 'docs', '.vitepress', 'theme', 'style.css'), 'utf8')
   const mobileRules = styles.match(/@media \(max-width: 640px\) \{([\s\S]*?)\n\}/)?.[1] ?? ''
 
-  assert.match(mobileRules, /\.VPHomeHero\s*\{[\s\S]*?padding-top:\s*132px\s*!important;/)
-  assert.match(mobileRules, /\.VPHomeHero::before\s*\{[\s\S]*?top:\s*76px;/)
+  assert.match(mobileRules, /\.VPHomeHero\s*\{[\s\S]*?min-height:\s*auto;/)
+  assert.match(mobileRules, /\.VPHomeHero\s*\{[\s\S]*?padding-top:\s*118px\s*!important;/)
+  assert.match(mobileRules, /\.VPHomeHero::before\s*\{[\s\S]*?top:\s*72px;/)
+})
+
+test('application homepage leads with researcher identity and review paths', () => {
+  const homepage = readFileSync(join(repositoryRoot, 'docs', 'index.md'), 'utf8')
+  assert.match(homepage, /Inferring dark-matter halos/)
+  assert.match(homepage, /Hongyi Xu/)
+  assert.match(homepage, /Department of Physics/)
+  assert.match(homepage, /Read the 2-minute overview/)
+  assert.match(homepage, /Explore a worked galaxy/)
+  assert.match(homepage, /View code and validation/)
+  assert.match(homepage, /<ApplicationHome\s*\/>/)
+  assert.doesNotMatch(homepage, /Image credits\s*\n\s*link:/)
+})
+
+test('researcher metadata is consistent across package and citation records', () => {
+  const pyproject = readFileSync(join(repositoryRoot, 'pyproject.toml'), 'utf8')
+  const citation = readFileSync(join(repositoryRoot, 'CITATION.cff'), 'utf8')
+  const about = readFileSync(join(repositoryRoot, 'docs', 'about', 'index.md'), 'utf8')
+  assert.match(pyproject, /name = "Hongyi Xu"/)
+  assert.match(citation, /family-names: Xu/)
+  assert.match(citation, /given-names: Hongyi/)
+  assert.match(citation, /Department of Physics, University of Toronto/)
+  assert.match(about, /Hongyi Xu/)
+  assert.match(about, /University of Toronto/)
+})
+
+test('navigation exposes application-oriented routes and canonical production URLs', () => {
+  const config = readFileSync(join(repositoryRoot, 'docs', '.vitepress', 'config.mts'), 'utf8')
+  assert.match(config, /canonicalRoot = 'https:\/\/planetarian39\.github\.io\/manga-dm\/'/)
+  assert.match(config, /text: 'Research'/)
+  assert.match(config, /text: 'Worked Example'/)
+  assert.match(config, /text: 'Reproducibility'/)
+  assert.match(config, /text: 'About'/)
+  assert.match(config, /link: '\/about\/'/)
 })
 
 test('public posterior downloads are not ignored by Git', () => {

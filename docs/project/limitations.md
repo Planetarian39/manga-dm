@@ -51,8 +51,8 @@ Stage 2 depends on overlap between each single-galaxy posterior and the candidat
 
 Outputs are constraints under the selected data, priors, NFW-equivalent profile, fixed inclination, stellar-only gravitational baryon model, pressure-support approximation, and quality gates. They are not assumption-free halo measurements.
 
-::: warning Paper method and current implementation
-Scientific limitations and implementation differences are separate. Current defaults do not instantiate the complete paper configuration: the paper profile requires $60^\circ$, `0.9545`, the full $\hat R$/ESS and NFW quality equations, and the prior-corrected sample likelihood. Current fallbacks use $45^\circ$, `0.95`, non-paper presets, warning-only empirical convergence enforcement, and GMM Stage 2 inputs by default. See [Implementation status](./implementation-status.md); do not fold these differences into scientific uncertainty.
+::: warning Manuscript method and current implementation
+Scientific limitations and implementation differences are separate. Current defaults do not instantiate the complete manuscript configuration: the manuscript profile requires $60^\circ$, `0.9545`, the full $\hat R$/ESS and NFW quality equations, and the prior-corrected sample likelihood. Current fallbacks use $45^\circ$, `0.95`, non-manuscript presets, warning-only empirical convergence enforcement, and GMM Stage 2 inputs by default. See [Implementation status](./implementation-status.md); do not fold these differences into scientific uncertainty.
 :::
 
 For the equations, return to [Methods](../methods/index.md).

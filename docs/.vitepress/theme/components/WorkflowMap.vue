@@ -12,9 +12,9 @@ const stages = [
 <template>
   <section class="workflow-map" aria-labelledby="workflow-map-title">
     <header class="workflow-map__header">
-      <p class="section-kicker">Method ledger</p>
+      <p class="section-kicker">Research workflow</p>
       <h2 id="workflow-map-title">One inference chain, four auditable stages</h2>
-      <p>Follow the scientific method first, then move to the commands and files that implement it.</p>
+      <p>Each stage links a modeling decision to the public method record and its current implementation.</p>
     </header>
     <ol class="workflow-map__grid">
       <li v-for="stage in stages" :key="stage.number">

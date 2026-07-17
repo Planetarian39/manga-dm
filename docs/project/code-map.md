@@ -1,6 +1,6 @@
 # Method-to-code map
 
-This map links finalized-paper concepts to the current implementation. A link means “implementation entry point,” not “numerically proven identical to the paper.” Known differences are collected in [implementation status](/project/implementation-status).
+This map links manuscript-aligned concepts to the current implementation. A link means “implementation entry point,” not “numerically proven identical to the manuscript analysis.” Known differences are collected in [implementation status](/project/implementation-status).
 
 | Method concept | Current implementation entry | Responsibility |
 |---|---|---|
@@ -22,7 +22,7 @@ This map links finalized-paper concepts to the current implementation. A link me
 ## Reading a status callout
 
 - **Aligned:** the documented setting or behavior is visible in current code.
-- **Implementation alternative:** code provides a useful path that is not the finalized-paper path.
-- **Alignment required:** the paper and current fallback/preset differ or enforcement is incomplete.
+- **Implementation alternative:** code provides a useful path that is not the manuscript-aligned path.
+- **Alignment required:** the manuscript method and current fallback/preset differ or enforcement is incomplete.
 
 No scientific code was changed to create this documentation.

@@ -1,6 +1,6 @@
 # CLI workflow
 
-The CLI parses global configuration first and dispatches each subcommand to the corresponding pipeline module. Commands below describe current public behavior; method pages separately document finalized-paper values.
+The CLI parses global configuration first and dispatches each subcommand to the corresponding pipeline module. Commands below describe current public behavior; method pages separately document manuscript-aligned values.
 
 ## 1. Select targets
 
@@ -37,16 +37,16 @@ manga stage2 --diagnose --quality-cut recommended
 
 <MethodStatus status="paper">
 
-The finalized Stage 2 method uses the prior-corrected posterior-sample
-likelihood and the finalized quality gate.
+The manuscript Stage 2 method uses the prior-corrected posterior-sample
+likelihood and the manuscript quality gate.
 
 </MethodStatus>
 
 <MethodStatus status="implementation">
 
 Current population code defaults to the GMM path unless explicitly configured
-otherwise, and the public CLI has no complete paper-aligned Stage 2 switch.
-Treat `recommended` as an implementation preset, not the finalized paper gate.
+otherwise, and the public CLI has no complete manuscript-aligned Stage 2 switch.
+Treat `recommended` as an implementation preset, not the current manuscript gate.
 
 </MethodStatus>
 
@@ -57,7 +57,7 @@ manga figures --ifu 8994-12701 7977-3704 --output-dir figures
 manga sample --n 10
 ```
 
-Figure generation is a local analysis capability. This public site publishes only allowlisted single-galaxy figures and does not distribute aggregate paper figures or robustness outcomes.
+Figure generation is a local analysis capability. This public site publishes only allowlisted single-galaxy figures and does not distribute aggregate manuscript figures or robustness outcomes.
 
 ## Global overrides
 

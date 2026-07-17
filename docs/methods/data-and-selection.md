@@ -1,11 +1,18 @@
 ---
 title: Data and Selection
-description: MaNGA inputs, projected geometry, spaxel screening, and the paper-aligned selection rules.
+description: MaNGA inputs, projected geometry, spaxel screening, and the manuscript-aligned selection rules.
 ---
 
 # Data products and sample selection
 
 The pipeline combines spatially resolved MaNGA emission-line measurements with catalog-level photometric and structural quantities. The velocity-field model uses the MaNGA DR17 Data Analysis Pipeline (DAP) MAPS products, while galaxy-level anchors come from DRPALL.
+
+::: info What this page demonstrates
+- **Scientific purpose:** turn MaNGA maps and catalog quantities into physically interpretable, quality-controlled model inputs.
+- **Key modeling decision:** restrict velocity information to reliable spaxels with useful rotational projection.
+- **My implementation contribution:** I connected data preparation, projected geometry, masks, and galaxy-level screening in the reproducible pipeline.
+- **Main limitation:** the selected population is conditional on disk-like kinematics and is not representative of every MaNGA galaxy.
+:::
 
 ## Observational inputs
 
@@ -38,7 +45,7 @@ where $V_{\mathrm{sys}}$ is the systemic velocity, $i$ is inclination, and $\phi
 
 ## Spaxel-level screen
 
-The finalized method retains a velocity spaxel when the required values are finite and:
+The manuscript method retains a velocity spaxel when the required values are finite and:
 
 - H-alpha velocity SNR is at least 10;
 - its azimuthal offset from the major axis is at most $60^\circ$;
@@ -48,7 +55,7 @@ The major-axis restriction avoids giving minor-axis spaxels, where the rotationa
 
 ## Galaxy-level empirical screen
 
-A galaxy proceeds from empirical fitting only when all paper gates are satisfied:
+A galaxy proceeds from empirical fitting only when all manuscript gates are satisfied:
 
 $$
 \left\{
@@ -64,14 +71,14 @@ g_{\mathrm{HDI}} &> 0.80.
 \right.
 $$
 
-Here $R_t$ is the empirical turnover radius, $R_{\mathrm{out}}$ is the outer usable radius, $f_{\mathrm{HDI}}$ is the fraction of observed velocities inside the posterior-predictive interval, and $g_{\mathrm{HDI}}$ is the fraction whose measurement interval overlaps that predictive interval. The interval probability is `0.9545`; paper prose describes it as 95%.
+Here $R_t$ is the empirical turnover radius, $R_{\mathrm{out}}$ is the outer usable radius, $f_{\mathrm{HDI}}$ is the fraction of observed velocities inside the posterior-predictive interval, and $g_{\mathrm{HDI}}$ is the fraction whose measurement interval overlaps that predictive interval. The interval probability is `0.9545`; manuscript prose describes it as 95%.
 
 These rules define a kinematically selected analysis population. They should be published without reporting how many galaxies pass or fail any stage.
 
 <MethodStatus status="paper">
 
-The paper-aligned azimuthal limit is 60°, and the exact predictive
-probability is `0.9545`. The paper quality equation enforces its stated
+The manuscript-aligned azimuthal limit is 60°, and the exact predictive
+probability is `0.9545`. The manuscript quality equation enforces its stated
 diagnostic gates before posterior samples enter Stage 2.
 
 </MethodStatus>
@@ -82,7 +89,7 @@ diagnostic gates before posterior samples enter Stage 2.
 `HDI_PROB2 = 0.95`. Current masks add IVAR-percentile and optional
 gas-dispersion checks, while empirical R-hat and ESS are warnings rather
 than enforced pass conditions. Named presets and the default GMM Stage 2 path
-do not reproduce the paper configuration.
+do not reproduce the manuscript configuration.
 
 </MethodStatus>
 

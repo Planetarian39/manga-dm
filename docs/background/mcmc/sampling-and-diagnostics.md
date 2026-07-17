@@ -131,12 +131,12 @@ validate the probability model or the numerical exploration.
 
 This section preserves the project-specific teaching material from the
 original guide. The [Methods section](/methods/single-galaxy-nfw) is the
-canonical source for the finalized-paper method and any implementation-status
+canonical source for the manuscript-aligned method and any implementation-status
 differences.
 
-::: warning Paper and implementation profiles
+::: warning Manuscript and implementation profiles
 The parameter roles and equations below explain the model structure. Public
-reproduction must use the paper-aligned profile documented in Methods rather
+reproduction must use the manuscript-aligned profile documented in Methods rather
 than inferring settings from this background page or from current CLI
 defaults.
 :::
@@ -303,7 +303,7 @@ $$
 $$
 
 This can reduce the influence of inner spaxels affected by beam smearing, but
-the paper-aligned values and rationale must be read from the canonical Methods
+the manuscript-aligned values and rationale must be read from the canonical Methods
 page.
 
 ### Abridged PyMC implementation
@@ -372,7 +372,7 @@ Each single-galaxy fit is evaluated with sampling and predictive diagnostics:
 | Posterior predictive $p$-value | Replicated data are inconsistent with the observation |
 | $|\rho(c,M_{200})|$ | Halo parameters remain excessively degenerate for the downstream use |
 
-The paper-aligned quality preset, including exact thresholds, belongs on
+The manuscript-aligned quality preset, including exact thresholds, belongs on
 [Diagnostics and quality gates](/methods/diagnostics-and-quality-gates).
 This background page intentionally reports no aggregate pass counts.
 

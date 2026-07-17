@@ -7,6 +7,13 @@ description: Stellar, NFW halo, pressure-support, prior, likelihood, and samplin
 
 For each galaxy that passes empirical screening, the physical model decomposes ordered rotational support into stellar, dark-matter, and pressure-support terms. It retains the complete posterior because the halo parameters are correlated and can have non-Gaussian geometry.
 
+::: info What this page demonstrates
+- **Scientific purpose:** infer stellar and NFW halo contributions while retaining correlated parameter uncertainty.
+- **Key modeling decision:** sample the full stellar-plus-NFW model with NUTS instead of reporting only a best fit.
+- **My implementation contribution:** I built the PyMC 5 posterior-inference and uncertainty-quantification workflow used for the public galaxy cases.
+- **Main limitation:** limited radial coverage, fixed inclination, baryonic assumptions, and beam smearing can all affect the inferred halo parameters.
+:::
+
 ## Force budget
 
 $$
@@ -85,7 +92,7 @@ The Moster et al. (2013) constants are defined in `src/config/constants.py`. Thi
 
 ## Priors
 
-| Parameter | Finalized prior | Purpose |
+| Parameter | Manuscript prior | Purpose |
 |---|---|---|
 | $\log_{10}M_\star$ | $\mathcal N(\log_{10}M_{\star,\mathrm{NSA}},0.05\,\mathrm{dex})$ | Photometric mass anchor |
 | $\log_{10}M_{200}$ | $\mathcal{TN}(\mu_{\mathrm{SHMR}},0.15\,\mathrm{dex};\pm3\sigma)$ | Halo-mass anchor |
@@ -95,10 +102,10 @@ The Moster et al. (2013) constants are defined in `src/config/constants.py`. Thi
 | $i$ | $\delta(i-i_{\mathrm{NSA}})$ | Fixed photometric inclination |
 | $\log_{10}R_e$ | log-normal about $R_{e,\mathrm{NSA}}$, width $0.05\,\mathrm{dex}$ | Structural scale |
 | $\operatorname{logit}(f_{\mathrm{bulge}})$ | $\mathcal N(1.2(n-2.5),0.2)$ | Sersic morphology anchor |
-| $\sigma_{\mathrm{int}}$ | Exponential with paper-stated scale $2\bar\sigma_{\mathrm{meas}}$ | Scatter beyond IVAR |
+| $\sigma_{\mathrm{int}}$ | Exponential with manuscript-stated scale $2\bar\sigma_{\mathrm{meas}}$ | Scatter beyond IVAR |
 | $\nu-2$ | $\Gamma(2.0,0.1)$ | Student-t tail weight |
 
-Reproducible metadata should record rate-versus-scale conventions for Gamma and Exponential APIs. The table preserves the paper parameterization; `src/models/dm_nfw.py` provides the executable mapping.
+Reproducible metadata should record rate-versus-scale conventions for Gamma and Exponential APIs. The table preserves the manuscript parameterization; `src/models/dm_nfw.py` provides the executable mapping.
 
 ## Likelihood and inner weighting
 
@@ -113,7 +120,7 @@ The log-likelihood has a radial logistic weight with half-weight radius $0.3r_{\
 
 ## Sampling and output
 
-| Setting | Finalized value |
+| Setting | Manuscript value |
 |---|---:|
 | Framework | PyMC 5 |
 | Sampler | NUTS with `nutpie` |
@@ -127,7 +134,7 @@ The pipeline stores raw posterior draws rather than only medians or equal-tailed
 
 <MethodStatus status="paper">
 
-The paper requires reduced chi-squared ≤ 2.0, PPC p-value from 0.1 through
+The manuscript requires reduced chi-squared ≤ 2.0, PPC p-value from 0.1 through
 0.9, absolute concentration–mass correlation ≤ 0.85, R-hat ≤ 1.05, and bulk
 ESS ≥ 200. Stage 2 uses prior-corrected
 posterior samples.
@@ -138,7 +145,7 @@ posterior samples.
 
 The NFW sampler settings match, but upstream `60°`/`0.9545` screening is not a
 versioned profile. Neither `recommended` nor `strict` matches the complete
-paper equation, and the public population path defaults to GMM inputs.
+manuscript equation, and the public population path defaults to GMM inputs.
 
 </MethodStatus>
 

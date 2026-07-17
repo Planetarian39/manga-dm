@@ -1,18 +1,28 @@
 import { defineConfig } from 'vitepress'
 
 const repository = 'https://github.com/Planetarian39/manga-dm'
+const canonicalRoot = 'https://planetarian39.github.io/manga-dm/'
 
 export default defineConfig({
   title: 'MaNGA Dark Matter',
   titleTemplate: ':title | MaNGA Dark Matter',
-  description: 'Methods, implementation notes, and reproducible workflows for the MaNGA dark-matter analysis pipeline.',
+  description: 'Hongyi Xu\'s computational astrophysics project: Bayesian dark-matter halo inference from MaNGA galaxy kinematics.',
   lang: 'en-US',
   base: '/manga-dm/',
   srcExclude: ['superpowers/**'],
   cleanUrls: false,
   lastUpdated: true,
   sitemap: {
-    hostname: 'https://planetarian39.github.io/manga-dm/',
+    hostname: canonicalRoot,
+  },
+  transformHead({ pageData }) {
+    const relativePath = pageData.relativePath.replaceAll('\\', '/')
+    const publicPath = relativePath === 'index.md'
+      ? ''
+      : relativePath.endsWith('/index.md')
+        ? relativePath.slice(0, -'index.md'.length)
+        : relativePath.replace(/\.md$/, '.html')
+    return [['link', { rel: 'canonical', href: new URL(publicPath, canonicalRoot).href }]]
   },
   head: [
     ['meta', { name: 'theme-color', content: '#102a43' }],
@@ -29,11 +39,28 @@ export default defineConfig({
     siteTitle: 'MaNGA / Dark Matter',
     nav: [
       { text: 'Overview', link: '/' },
-      { text: 'Methods', link: '/methods/' },
-      { text: 'Case studies', link: '/case-studies/' },
-      { text: 'Run the pipeline', link: '/run/' },
-      { text: 'Background', link: '/background/mcmc/' },
-      { text: 'Project', link: '/project/architecture' },
+      {
+        text: 'Research',
+        items: [
+          { text: 'Two-minute overview', link: '/overview/project-overview.html' },
+          { text: 'Scientific methods', link: '/methods/' },
+          { text: 'Diagnostics and quality', link: '/methods/diagnostics-and-quality-gates.html' },
+          { text: 'Limitations', link: '/project/limitations.html' },
+        ],
+      },
+      { text: 'Worked Example', link: '/case-studies/11743-9102.html' },
+      {
+        text: 'Reproducibility',
+        items: [
+          { text: 'Run the pipeline', link: '/run/' },
+          { text: 'Architecture', link: '/project/architecture.html' },
+          { text: 'Implementation status', link: '/project/implementation-status.html' },
+          { text: 'Downloads and provenance', link: '/case-studies/downloads.html' },
+          { text: 'Application snapshot', link: '/project/application-snapshot.html' },
+          { text: 'MCMC appendix', link: '/background/mcmc/' },
+        ],
+      },
+      { text: 'About', link: '/about/' },
     ],
     sidebar: {
       '/methods/': [
@@ -94,6 +121,17 @@ export default defineConfig({
             { text: 'Implementation status', link: '/project/implementation-status' },
             { text: 'Limitations', link: '/project/limitations' },
             { text: 'Future research', link: '/project/future-research' },
+            { text: 'Application snapshot', link: '/project/application-snapshot' },
+          ],
+        },
+      ],
+      '/about/': [
+        {
+          text: 'Researcher',
+          items: [
+            { text: 'About Hongyi Xu', link: '/about/' },
+            { text: 'Two-minute overview', link: '/overview/project-overview' },
+            { text: 'Application snapshot', link: '/project/application-snapshot' },
           ],
         },
       ],
@@ -131,8 +169,8 @@ export default defineConfig({
       next: 'Next',
     },
     footer: {
-      message: 'Methods documentation for the MaNGA dark-matter analysis pipeline.',
-      copyright: 'Released with the project source; unpublished aggregate findings are intentionally excluded.',
+      message: 'A computational astrophysics research project by Hongyi Xu, Department of Physics, University of Toronto.',
+      copyright: 'Methods, software, and allowlisted case artifacts are public; unpublished aggregate findings are intentionally excluded.',
     },
   },
 })

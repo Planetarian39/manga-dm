@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "If you use manga-dm, please cite this software and its accompanying manuscript when available."
+title: "manga-dm: Bayesian inference from MaNGA galaxy kinematics"
+type: software
+authors:
+  - family-names: Xu
+    given-names: Hongyi
+    affiliation: "Department of Physics, University of Toronto, Toronto, Ontario, Canada"
+repository-code: "https://github.com/Planetarian39/manga-dm"
+url: "https://planetarian39.github.io/manga-dm/"
+version: 0.1.0
+license: MIT
+keywords:
+  - astronomy
+  - dark matter
+  - galaxy dynamics
+  - Bayesian inference
+  - MaNGA
+  - PyMC
+abstract: >-
+  A Python research pipeline for MaNGA gas-kinematic screening, empirical
+  rotation curves, single-galaxy stellar-plus-NFW inference, posterior-sample
+  management, and population-model diagnostics.

@@ -111,9 +111,12 @@ jobs:
           curl --fail --location --retry 5 --retry-all-errors \
             --output "${root_html}" "${SITE_URL}"
           for path in \
+            'overview/project-overview.html' \
             'methods/single-galaxy-nfw.html' \
             'case-studies/11743-9102.html' \
             'run/cli-workflow.html' \
+            'project/application-snapshot.html' \
+            'about/' \
             'background/mcmc/' \
             'assets/case-studies/11743-9102/nfw-fit.png'; do
             curl --fail --location --retry 5 --retry-all-errors \

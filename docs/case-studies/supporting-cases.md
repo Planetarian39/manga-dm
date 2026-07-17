@@ -73,7 +73,7 @@ The aligned draws have a Pearson correlation of -0.7291. The value is included t
 | `log10_M200` | 13.3064 | 13.4547 | 13.6046 |
 | `log10_c` | 0.8316 | 0.8928 | 0.9553 |
 
-The aligned draws have a Pearson correlation of -0.8980. The finalized paper quality equation uses `|rho| <= 0.85`; this example therefore illustrates why downstream quality gates must be evaluated explicitly rather than inferred from file presence.
+The aligned draws have a Pearson correlation of -0.8980. The current manuscript quality equation uses `|rho| <= 0.85`; this example therefore illustrates why downstream quality gates must be evaluated explicitly rather than inferred from file presence.
 
 [Open the verified downloads list](/case-studies/downloads#files)
 

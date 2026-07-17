@@ -6,7 +6,7 @@ const props = defineProps<{
   status: 'paper' | 'implementation'
 }>()
 
-const label = computed(() => (props.status === 'paper' ? 'Paper method' : 'Current implementation'))
+const label = computed(() => (props.status === 'paper' ? 'Manuscript method' : 'Current implementation'))
 </script>
 
 <template>

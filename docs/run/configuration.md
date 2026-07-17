@@ -20,9 +20,9 @@ Global `--data-dir` and `--result-dir` override configured directories. Relative
 | `[rc]` | Rotation-curve preparation | radius floor, intrinsic axis ratio, velocity error |
 | `[plateifus]` | Plate-IFU and inclination selection | list paths and fallback bounds |
 
-## Paper-aligned values are not current fallbacks
+## Manuscript-aligned values are not current fallbacks
 
-| Decision | Finalized-paper method | Current fallback or preset |
+| Decision | Manuscript-aligned method | Current fallback or preset |
 |---|---:|---:|
 | Major-axis azimuth | at most 60° | 45° fallback |
 | Predictive HDI | 0.9545 (rounded to 95% in prose) | 0.95 fallback |
@@ -32,14 +32,14 @@ Global `--data-dir` and `--result-dir` override configured directories. Relative
 
 <MethodStatus status="paper">
 
-Paper reproduction requires one pinned profile containing the finalized
+Manuscript reproduction requires one pinned profile containing the manuscript
 screening values, quality equation, likelihood mode, and sampler settings.
 
 </MethodStatus>
 
 <MethodStatus status="implementation">
 
-Neither `recommended` nor `strict` is a finalized-paper preset. Until a versioned paper profile exists, record the full configuration used for every run and keep the method/implementation distinction visible.
+Neither `recommended` nor `strict` is a manuscript-aligned preset. Until a versioned manuscript profile exists, record the full configuration used for every run and keep the method/implementation distinction visible.
 
 </MethodStatus>
 

@@ -7,6 +7,13 @@ description: Factored Student-t concentration-mass model and prior-corrected pos
 
 The population stage treats each accepted single-galaxy posterior as a sampled representation of that galaxy's likelihood geometry. It does not replace a curved $M_{200}$-$c$ posterior with a median, covariance matrix, or Gaussian approximation.
 
+::: info What this page demonstrates
+- **Scientific purpose:** propagate galaxy-level uncertainty into a population model without flattening curved posterior geometry.
+- **Key modeling decision:** evaluate a prior-corrected importance-sampling likelihood on retained posterior draws.
+- **My implementation contribution:** I implemented the population-level inference workflow and the statistical utilities used to diagnose posterior reweighting.
+- **Main limitation:** the result is conditional on selection and requires adequate importance-sampling support for every included galaxy.
+:::
+
 ## Concentration-mass parameterization
 
 $$
@@ -50,7 +57,7 @@ The factors share $\nu$, allowing the selected halo-mass distribution and deviat
 
 ## Population priors
 
-| Parameter | Finalized prior | Role |
+| Parameter | Manuscript prior | Role |
 |---|---|---|
 | $\mu_M$ | $\mathcal N(\bar m_{\mathrm{obs}},1.0^2)$ | Broad center for the selected mass distribution |
 | $\sigma_M$ | $\mathcal{HN}(1.0)$ | Positive mass-distribution width |
@@ -91,7 +98,7 @@ The denominator removes the single-galaxy prior before the candidate population 
 
 ## Truncated estimator
 
-Extreme weights can destabilize a finite-sample estimate. The finalized method caps weights at a galaxy-specific threshold $\tau_i$:
+Extreme weights can destabilize a finite-sample estimate. The manuscript method caps weights at a galaxy-specific threshold $\tau_i$:
 
 $$
 \log\mathcal L_i(\Phi)
@@ -109,8 +116,8 @@ This density is conditional on every upstream selection and quality gate. It des
 
 <MethodStatus status="paper">
 
-The finalized Stage 2 method is the prior-corrected posterior-sample
-likelihood above, using only galaxies that pass the finalized upstream gates.
+The manuscript Stage 2 method is the prior-corrected posterior-sample
+likelihood above, using only galaxies that pass the manuscript upstream gates.
 
 </MethodStatus>
 
@@ -118,7 +125,7 @@ likelihood above, using only galaxies that pass the finalized upstream gates.
 
 `fit_m200_c_population` defaults to `use_gmm=True` and `use_samples=False`.
 The sample-aware implementation exists, but an ordinary `manga stage2 --fit
---quality-cut recommended` run is not the paper path, and upstream profile
+--quality-cut recommended` run is not the manuscript path, and upstream profile
 differences remain.
 
 </MethodStatus>

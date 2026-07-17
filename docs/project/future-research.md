@@ -4,7 +4,7 @@ The current pipeline uses an empirical rotation curve as a screening and initial
 
 ## A possible shape representation
 
-A compact research representation might combine the turnover scale, inner gradient, outer slope, and posterior uncertainty rather than assigning a visual class to one best-fit curve. That representation would need to remain separate from the current paper method until its selection effects and numerical behavior are validated.
+A compact research representation might combine the turnover scale, inner gradient, outer slope, and posterior uncertainty rather than assigning a visual class to one best-fit curve. That representation would need to remain separate from the current manuscript method until its selection effects and numerical behavior are validated.
 
 ## Questions to resolve
 

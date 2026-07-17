@@ -7,6 +7,7 @@
   ],
   "requiredPages": [
     "index.md",
+    "about/index.md",
     "overview/project-overview.md",
     "methods/index.md",
     "methods/data-and-selection.md",
@@ -33,7 +34,8 @@
     "project/code-map.md",
     "project/implementation-status.md",
     "project/limitations.md",
-    "project/future-research.md"
+    "project/future-research.md",
+    "project/application-snapshot.md"
   ],
   "forbiddenExtensions": [
     ".tex",
@@ -61,6 +63,8 @@
   "summaryManifest": "public/meta/case-study-summaries.json",
   "additionalPublicAssets": [
     "assets/home/manga-telescope.png",
+    "assets/home/manga-telescope.webp",
+    "assets/home/manga-telescope-mobile.webp",
     "assets/home/milky-way-anatomy.jpg"
   ]
 }

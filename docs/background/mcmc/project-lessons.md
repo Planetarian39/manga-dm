@@ -70,7 +70,7 @@ Model development proceeded through repeated cycles:
 This process motivated the robust Student-t likelihood, explicit residual
 scatter, radial weighting, and the separation between single-galaxy and
 population inference. Each choice should still be judged against the
-paper-aligned specification and reproducibility tests rather than accepted
+manuscript-aligned specification and reproducibility tests rather than accepted
 because it appears in the current implementation.
 
 ## Sampler and backend evaluation

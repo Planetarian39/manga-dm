@@ -7,9 +7,16 @@ description: Convergence, predictive, fit-quality, degeneracy, and importance-sa
 
 No single diagnostic is sufficient. A fit can mix well but describe the velocity field poorly; it can pass residual checks while retaining an unusably degenerate halo posterior; and a valid single-galaxy posterior can still be a poor importance proposal for a candidate population model.
 
+::: info What this page demonstrates
+- **Scientific purpose:** evaluate convergence, predictive adequacy, fit quality, posterior geometry, and importance support together.
+- **Key modeling decision:** retain a galaxy only when the complete diagnostic equation is satisfied.
+- **My implementation contribution:** I connected numerical diagnostics, case-study plots, quality-gate documentation, and explicit implementation-gap tracking.
+- **Main limitation:** thresholds identify known failure modes but cannot remove model misspecification or create radial information absent from the data.
+:::
+
 ## Empirical-stage gates
 
-| Diagnostic | Paper requirement | Purpose |
+| Diagnostic | Manuscript requirement | Purpose |
 |---|---:|---|
 | Inclination | $25^\circ\le i\le70^\circ$ | Avoid weak face-on projection and highly inclined geometry |
 | Usable spaxels | $N_{\mathrm{valid}}\ge150$ | Require spatial information |
@@ -19,7 +26,7 @@ No single diagnostic is sufficient. A fit can mix well but describe the velocity
 | Predictive coverage | $f_{\mathrm{HDI}}>0.60$ | Observations fall inside the predictive interval |
 | Predictive overlap | $g_{\mathrm{HDI}}>0.80$ | Measurement intervals overlap predictive intervals |
 
-Coverage and overlap use predictive probability `0.9545`, described as 95% in paper prose.
+Coverage and overlap use predictive probability `0.9545`, described as 95% in manuscript prose.
 
 ## Single-galaxy NFW retention
 
@@ -84,11 +91,11 @@ The importance ESS fraction, $\mathrm{ESS}/S$, measures how many draws materiall
 4. Apply the complete NFW retention equation.
 5. Confirm that prior metadata accompanies posterior samples.
 6. Inspect Pareto $\hat k$ and importance ESS during Stage 2.
-7. Record implementation fallbacks as provenance, not equivalent paper settings.
+7. Record implementation fallbacks as provenance, not equivalent manuscript settings.
 
 <MethodStatus status="paper">
 
-The paper uses the complete quality equation on this page together with
+The manuscript uses the complete quality equation on this page together with
 `60°`/`0.9545` screening and a posterior-sample Stage 2 path.
 
 </MethodStatus>
@@ -98,7 +105,7 @@ The paper uses the complete quality equation on this page together with
 `recommended` uses reduced chi-squared `3.0`, PPC `0.05`--`0.95`, and
 correlation `0.95`. `strict` reaches `2.0` and `0.10`--`0.90` but uses
 correlation `0.90` and adds different coverage gates. Empirical R-hat/ESS
-warn rather than determine the pass boolean, and neither preset is the paper
+warn rather than determine the pass boolean, and neither preset is the manuscript
 profile.
 
 </MethodStatus>
