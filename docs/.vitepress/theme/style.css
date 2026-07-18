@@ -475,6 +475,7 @@ h3,
   margin: 0;
   color: #f6f1e7;
   font-size: clamp(2rem, 3.4vw, 3rem);
+  line-height: 1.12;
 }
 
 .manuscript-preview__notice {

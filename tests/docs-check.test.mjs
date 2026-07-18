@@ -290,6 +290,13 @@ test('manuscript previews remain licensed and allowlisted', () => {
   assert.doesNotMatch(gallery, /<figcaption>/)
 })
 
+test('wrapped manuscript preview heading keeps readable line spacing', () => {
+  const styles = readFileSync(join(repositoryRoot, 'docs', '.vitepress', 'theme', 'style.css'), 'utf8')
+  const headingRules = styles.match(/\.manuscript-preview h2\s*\{([\s\S]*?)\n\}/)?.[1] ?? ''
+
+  assert.match(headingRules, /line-height:\s*1\.12;/)
+})
+
 test('licensing separates MIT software from protected research content', () => {
   const readme = readFileSync(join(repositoryRoot, 'README.md'), 'utf8')
   const about = readFileSync(join(repositoryRoot, 'docs', 'about', 'index.md'), 'utf8')
