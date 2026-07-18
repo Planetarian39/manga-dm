@@ -2,7 +2,7 @@
 
 `manga-dm` is a Python research pipeline for MaNGA gas-kinematic screening, empirical rotation curves, single-galaxy NFW inference, posterior-sample management, and population-model diagnostics. The public interface is the `manga` CLI; scientific modules live under `src/`.
 
-Developed by **Hongyi Xu**, an undergraduate student in the Department of Physics at the University of Toronto. The project accompanies a first-author manuscript in preparation for arXiv and subsequent journal submission. The public repository documents methods, software, and allowlisted single-galaxy artifacts without releasing aggregate manuscript findings.
+Developed by **Hongyi Xu**, an undergraduate student in the Department of Physics at the University of Toronto. The project accompanies a first-author manuscript in preparation for arXiv and subsequent journal submission. The public repository documents three sample-size milestones, methods, software, and allowlisted single-galaxy artifacts without releasing aggregate scientific findings.
 
 ## Documentation
 
@@ -13,7 +13,7 @@ Developed by **Hongyi Xu**, an undergraduate student in the Department of Physic
 - [About the researcher](https://planetarian39.github.io/manga-dm/about/)
 - [Application snapshot](https://planetarian39.github.io/manga-dm/project/application-snapshot.html)
 
-The site presents methods, implementation status, MCMC background, and four allowlisted single-galaxy examples. Unpublished aggregate findings, discussion, conclusions, paper sources, and full-sample products are intentionally excluded.
+The site presents sample-size milestones, methods, implementation status, MCMC background, and four allowlisted single-galaxy examples. Aggregate posterior findings, discussion, conclusions, paper sources, and full-sample products are intentionally excluded.
 
 ## Pipeline
 

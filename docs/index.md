@@ -12,19 +12,22 @@ hero:
     - theme: alt
       text: Galaxy 11743-9102
       link: /case-studies/11743-9102.html
-    - theme: alt
-      text: Architecture
-      link: /project/architecture.html
 
 features:
-  - title: Research question
-    details: How well can spatially resolved ionized-gas kinematics constrain dark-matter halo mass and concentration under realistic radial-coverage and model limitations?
-  - title: My contribution
-    details: I built the Bayesian inference and uncertainty-quantification workflow, connecting data screening, galaxy modeling, posterior diagnostics, and reproducible documentation.
-  - title: Evidence of rigor
-    details: Four reviewable galaxy cases, complete posterior artifacts, explicit provenance, convergence diagnostics, known limitations, and automated documentation checks.
+  - title: Start with the research question
+    details: Read the concise account of the scientific question, inference chain, contribution, evidence, and limits.
+    link: /overview/project-overview.html
+    linkText: Read the project overview
+  - title: Inspect the evidence
+    details: Follow one galaxy from velocity-field context through posterior geometry, diagnostics, and a downloadable artifact.
+    link: /case-studies/11743-9102.html
+    linkText: Open the worked example
+  - title: Check implementation limits
+    details: Compare the manuscript method with current CLI defaults and the validation still required for reproduction claims.
+    link: /project/implementation-status.html
+    linkText: Review implementation status
   - title: Galaxy sample
-    details: 8,070 (inclination-selected)<br>1,234 (empirically screened)<br>620 (final population-fit)
+    details: 8,070 (inclination-selected)<br>1,234 (empirically screened)<br>620 (final population-fit)<br><small>Sample-size milestones are public; aggregate scientific findings remain unpublished.</small>
 ---
 
 <ApplicationHome />

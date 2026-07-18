@@ -247,6 +247,7 @@ test('mobile home hero reserves space below the fixed navigation for its eyebrow
 
 test('application homepage leads with researcher identity and review paths', () => {
   const homepage = readFileSync(join(repositoryRoot, 'docs', 'index.md'), 'utf8')
+  const applicationHome = readFileSync(join(repositoryRoot, 'docs', '.vitepress', 'theme', 'components', 'ApplicationHome.vue'), 'utf8')
   const manuscriptPreview = readFileSync(join(repositoryRoot, 'docs', '.vitepress', 'theme', 'components', 'ManuscriptPreview.vue'), 'utf8')
   const themeLayout = readFileSync(join(repositoryRoot, 'docs', '.vitepress', 'theme', 'Layout.vue'), 'utf8')
   assert.match(homepage, /Inferring dark-matter halos/)
@@ -254,12 +255,21 @@ test('application homepage leads with researcher identity and review paths', () 
   assert.match(homepage, /Department of Physics/)
   assert.match(homepage, /Project overview/)
   assert.match(homepage, /Galaxy 11743-9102/)
-  assert.match(homepage, /Architecture/)
   assert.match(homepage, /Galaxy sample/)
+  assert.match(homepage, /Start with the research question/)
+  assert.match(homepage, /Inspect the evidence/)
+  assert.match(homepage, /Check implementation limits/)
+  assert.doesNotMatch(homepage, /- title: Research question/)
+  assert.doesNotMatch(homepage, /- title: My contribution/)
   assert.match(homepage, /8,070/)
   assert.match(homepage, /1,234/)
   assert.match(homepage, /620 \(final population-fit\)/)
+  assert.match(homepage, /Sample-size milestones are public; aggregate scientific findings remain unpublished/)
   assert.match(homepage, /<ApplicationHome\s*\/>/)
+  assert.doesNotMatch(applicationHome, /<WorkflowMap\s*\/>/)
+  assert.doesNotMatch(applicationHome, /class="validation-ledger"/)
+  assert.doesNotMatch(applicationHome, /class="researcher-band"/)
+  assert.match(applicationHome, /Review implementation status/)
   assert.match(themeLayout, /#home-features-before/)
   assert.match(themeLayout, /<ManuscriptPreview v-if="frontmatter\.layout === 'home'"\s*\/>/)
   assert.match(manuscriptPreview, /Manuscript preview · draft/)
@@ -309,15 +319,43 @@ test('licensing separates MIT software from protected research content', () => {
   const about = readFileSync(join(repositoryRoot, 'docs', 'about', 'index.md'), 'utf8')
   const softwareLicense = readFileSync(join(repositoryRoot, 'LICENSE'), 'utf8')
   const contentLicense = readFileSync(join(repositoryRoot, 'LICENSE-CONTENT.md'), 'utf8')
+  const publicContentLicense = readFileSync(join(repositoryRoot, 'docs', 'research-content-license.md'), 'utf8')
+  const manuscriptPreview = readFileSync(join(repositoryRoot, 'docs', 'paper-preview', 'index.md'), 'utf8')
+  const homePreview = readFileSync(join(repositoryRoot, 'docs', '.vitepress', 'theme', 'components', 'ManuscriptPreview.vue'), 'utf8')
 
   assert.match(softwareLicense, /MIT License for Software Source Code/)
   assert.match(softwareLicense, /LICENSE-CONTENT\.md/)
   assert.match(contentLicense, /All rights reserved/)
   assert.match(contentLicense, /may not copy,\s*redistribute, adapt, submit, or publish/)
+  assert.equal(publicContentLicense, contentLicense)
   assert.match(readme, /Research Content License/)
   assert.match(readme, /software package only/)
   assert.match(about, /Copyright and publication notice/)
-  assert.match(about, /LICENSE-CONTENT\.md/)
+  assert.match(about, /research-content-license/)
+  assert.match(about, /\[Research Content License\]\(\/research-content-license\)/)
+  assert.match(manuscriptPreview, /\[Research Content License\]\(\/research-content-license\)/)
+  assert.match(homePreview, /withBase\('\/research-content-license\.html'\)/)
+  assert.doesNotMatch(`${about}\n${manuscriptPreview}\n${homePreview}`, /github\.com\/Planetarian39\/manga-dm\/blob\/main\/LICENSE-CONTENT\.md/)
+})
+
+test('deep case keeps the identifier together and limits the page outline to H2', () => {
+  const page = readFileSync(join(repositoryRoot, 'docs', 'case-studies', '11743-9102.md'), 'utf8')
+  const styles = readFileSync(join(repositoryRoot, 'docs', '.vitepress', 'theme', 'style.css'), 'utf8')
+  const headingRules = styles.match(/\.vp-doc h1\s*\{([\s\S]*?)\n\}/)?.[1] ?? ''
+
+  assert.match(page, /outline:\s*\[2, 2\]/)
+  assert.match(page, /MaNGA <span class="no-break">11743-9102<\/span>/)
+  assert.match(headingRules, /line-height:\s*1\.07;/)
+})
+
+test('run entry page exposes a non-computational quick start', () => {
+  const page = readFileSync(join(repositoryRoot, 'docs', 'run', 'index.md'), 'utf8')
+
+  assert.match(page, /## Quick start/)
+  assert.match(page, /pip install -e \./)
+  assert.match(page, /manga --help/)
+  assert.match(page, /manga stage1 --help/)
+  assert.match(page, /without starting a scientific fit/)
 })
 
 test('researcher metadata is consistent across package and citation records', () => {
@@ -447,6 +485,16 @@ test('case provenance pins the private scientific source inputs', () => {
   assert.equal(provenance.sourceRepository?.path, undefined)
   assert.match(provenance.sourceArchiveSha256 ?? '', /^[a-f\d]{64}$/)
   assert.match(provenance.sourceThesisSha256 ?? '', /^[a-f\d]{64}$/)
+
+  const tracePreview = provenance.artifacts.find(
+    (artifact) => artifact.publicPath === 'assets/case-studies/11743-9102/posterior-trace.webp',
+  )
+  assert.equal(tracePreview?.artifactType, 'posterior_trace_preview_webp_lossless')
+  assert.ok(tracePreview?.bytes < 1_000_000)
+
+  const casePage = readFileSync(join(repositoryRoot, 'docs', 'case-studies', '11743-9102.md'), 'utf8')
+  assert.match(casePage, /posterior-trace\.webp/)
+  assert.match(casePage, /Open the full-resolution PNG/)
 })
 
 test('paper and implementation status use explicit paired component states', () => {

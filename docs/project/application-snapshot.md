@@ -40,6 +40,6 @@ The GitHub Pages workflow additionally runs Python documentation-tool tests and 
 
 ## Release boundary
 
-This snapshot documents methods, software, and allowlisted single-galaxy artifacts. It excludes manuscript source files, aggregate sample products, population findings, discussion, conclusions, and novelty claims. The public CLI is not labeled as a complete manuscript-reproduction profile until its configuration, likelihood route, provenance, and numerical regressions are versioned together.
+This snapshot documents methods, software, three sample-size milestones, and allowlisted single-galaxy artifacts. It excludes manuscript source files, aggregate sample products, population findings, discussion, conclusions, and novelty claims. The public CLI is not labeled as a complete manuscript-reproduction profile until its configuration, likelihood route, provenance, and numerical regressions are versioned together.
 
 A final Git tag or GitHub release may pin the deployment commit after application review. Until then, the deployed GitHub Pages revision and repository history are the authoritative version record.

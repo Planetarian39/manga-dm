@@ -30,7 +30,7 @@ const manuscriptPages = [
       <p class="manuscript-preview__notice">
         Protected research content. Read and cite with attribution; do not reproduce, adapt, submit, or publish it
         without written permission. See the
-        <a href="https://github.com/Planetarian39/manga-dm/blob/main/LICENSE-CONTENT.md" target="_blank" rel="noopener">Research Content License</a>.
+        <a :href="withBase('/research-content-license.html')">Research Content License</a>.
       </p>
     </div>
     <div class="manuscript-preview__grid">

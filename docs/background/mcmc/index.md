@@ -80,5 +80,5 @@ derives that prior-corrected form.
 ## Scope
 
 These pages explain inference mechanics and the repository's modelling
-choices. They intentionally do not publish aggregate sample counts,
+choices. The site publishes three sample-size milestones for pipeline scope, but these pages intentionally do not publish aggregate diagnostic counts,
 population-fit values, headline findings, or scientific conclusions.

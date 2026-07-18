@@ -66,8 +66,6 @@ const contributions = [
       </div>
     </section>
 
-    <WorkflowMap />
-
     <section class="featured-case" aria-labelledby="featured-case-title">
       <div class="featured-case__media">
         <img
@@ -108,31 +106,6 @@ const contributions = [
       </div>
     </section>
 
-    <section class="validation-ledger" aria-labelledby="validation-title">
-      <div class="home-section-heading">
-        <p class="section-kicker">Validation and limits</p>
-        <h2 id="validation-title">Clear about what works—and what remains approximate</h2>
-      </div>
-      <div class="validation-ledger__grid">
-        <article>
-          <p class="validation-ledger__number">01</p>
-          <h3>What is validated</h3>
-          <p>Four pinned case artifacts, posterior summaries generated from source files, documentation boundary checks, and deployment-level route and byte-size checks.</p>
-        </article>
-        <article>
-          <p class="validation-ledger__number">02</p>
-          <h3>Known differences</h3>
-          <p>The public CLI contains the core scientific components, but its fallback thresholds and default Stage 2 path do not form one versioned manuscript profile.</p>
-        </article>
-        <article>
-          <p class="validation-ledger__number">03</p>
-          <h3>What comes next</h3>
-          <p>A versioned profile, complete provenance, and numerical regression against approved single-galaxy and population references before reproduction claims.</p>
-        </article>
-      </div>
-      <a class="text-link" :href="withBase('/project/implementation-status.html')">See the complete implementation status</a>
-    </section>
-
     <section class="reproducibility-band" aria-labelledby="reproducibility-title">
       <div>
         <p class="section-kicker">Reproducibility</p>
@@ -146,22 +119,7 @@ const contributions = [
       </ul>
       <div class="reproducibility-band__links">
         <a class="home-button home-button--brand" :href="withBase('/run/')">Run the pipeline</a>
-        <a class="home-button" :href="withBase('/project/architecture.html')">View code and architecture</a>
-      </div>
-    </section>
-
-    <section class="researcher-band" aria-labelledby="researcher-title">
-      <div>
-        <p class="section-kicker">About the researcher</p>
-        <h2 id="researcher-title">Hongyi Xu</h2>
-      </div>
-      <div>
-        <p class="researcher-band__identity">Undergraduate student in the Department of Physics at the University of Toronto.</p>
-        <p>
-          My research interests center on computational physics: using statistical inference, machine learning, and
-          reproducible computational experiments to extract physical insight from complex data.
-        </p>
-        <a class="text-link" :href="withBase('/about/')">Research background and contribution statement</a>
+        <a class="home-button" :href="withBase('/project/implementation-status.html')">Review implementation status</a>
       </div>
     </section>
 

@@ -2,6 +2,18 @@
 
 The public workflow has five operational transitions: select targets, fit single galaxies, merge posterior samples, fit or diagnose the population model, and generate figures. Use configuration deliberately—current defaults are not a manuscript-aligned profile.
 
+## Quick start
+
+Install the package from a checkout and verify the public interface before configuring data-backed runs:
+
+```powershell
+pip install -e .
+manga --help
+manga stage1 --help
+```
+
+These commands verify installation without starting a scientific fit. Continue to [Installation](/run/installation) for environment setup and [CLI workflow](/run/cli-workflow) for data-backed commands.
+
 ## Recommended reading order
 
 1. [Install the environment](/run/installation).

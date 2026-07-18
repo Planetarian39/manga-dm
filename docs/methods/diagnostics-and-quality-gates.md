@@ -81,7 +81,7 @@ the generic Pareto-$\hat k$ interpretation is:
 | $0.5\le\hat k<0.7$ | Caution; increasing tail sensitivity |
 | $\ge0.7$ | Unreliable raw importance-weight behavior |
 
-The importance ESS fraction, $\mathrm{ESS}/S$, measures how many draws materially contribute after reweighting. Low values mean that a few draws carry most of the likelihood estimate. These checks are per galaxy; unpublished aggregate counts and fractions are outside the public boundary.
+The importance ESS fraction, $\mathrm{ESS}/S$, measures how many draws materially contribute after reweighting. Low values mean that a few draws carry most of the likelihood estimate. These checks are per galaxy; aggregate diagnostic pass counts and fractions remain outside the public boundary.
 
 ## Decision checklist
 

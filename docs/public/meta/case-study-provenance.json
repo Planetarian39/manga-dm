@@ -44,6 +44,14 @@
     },
     {
       "galaxyId": "11743-9102",
+      "artifactType": "posterior_trace_preview_webp_lossless",
+      "sourcePath": "docs/mcmc/figures/11743-9102_posterior_trace_plot.png",
+      "publicPath": "assets/case-studies/11743-9102/posterior-trace.webp",
+      "sha256": "9dd892c456035ffc3b9ac4e96acb7edc1425ffd7c46b12966b7869f47e14d096",
+      "bytes": 945670
+    },
+    {
+      "galaxyId": "11743-9102",
       "artifactType": "joint_posterior_figure",
       "sourcePath": "docs/mcmc/figures/11743-9102_m200_c_comparison_pair.png",
       "publicPath": "assets/case-studies/11743-9102/m200-c-joint-posterior.png",

@@ -59,6 +59,6 @@ The public method record includes:
 
 ## Publication boundary
 
-These pages do not report sample attrition, aggregate posterior values, population figures, sensitivity-test outcomes, comparisons with simulations or other studies, physical interpretation, novelty claims, or conclusions from the unpublished analysis. The equations and rules are sufficient to understand and audit the pipeline without disclosing those results.
+The public site reports three sample-size milestones—8,070 inclination-selected, 1,234 empirically screened, and 620 final population-fit—to document pipeline scope. These pages do not report aggregate posterior values, population figures, sensitivity-test outcomes, comparisons with simulations or other studies, physical interpretation, novelty claims, or conclusions from the unpublished analysis. The equations and rules are sufficient to understand and audit the pipeline without disclosing those results.
 
 For the code-facing view, continue to [Implementation status](../project/implementation-status.md). For scientific scope and assumptions, see [Limitations](../project/limitations.md).

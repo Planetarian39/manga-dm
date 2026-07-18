@@ -9,7 +9,7 @@ I am an undergraduate student in the **Department of Physics at the University o
 
 ## Research focus
 
-My work is connected by method rather than by one physical scale. In this astrophysics project, I use Bayesian inference and MCMC to study dark-matter halo structure from MaNGA galaxy kinematics. In a second particle-physics project, I study how particle-level input representations affect PET / OmniLearn-style jet-tagging models on JetClass through controlled feature ablations and reproducible evaluation.
+Across physical scales, my work uses reproducible computation to connect models with evidence. In this astrophysics project, I use Bayesian inference and MCMC to study dark-matter halo structure from MaNGA galaxy kinematics. In a second particle-physics project, I study how particle-level input representations affect PET- and OmniLearn-style jet-tagging models on JetClass through controlled feature ablations and reproducible evaluation.
 
 Together, these projects have trained me to:
 
@@ -31,7 +31,7 @@ The public evidence for this work includes:
 - the [method-to-code map](/project/code-map);
 - the [implementation status](/project/implementation-status) and [limitations](/project/limitations).
 
-The project accompanies a **first-author manuscript in preparation for arXiv and subsequent journal submission**. The site deliberately separates the manuscript method from current CLI fallbacks and does not publish aggregate findings or conclusions from the manuscript.
+The project accompanies a **first-author manuscript in preparation for arXiv and subsequent journal submission**. The site publishes three sample-size milestones to document pipeline scope, while aggregate posterior findings, scientific conclusions, and the full-sample products remain unpublished. It also separates the manuscript method from current CLI fallbacks.
 
 ## Research interests
 
@@ -39,7 +39,7 @@ Computational physics · Bayesian inference · uncertainty quantification · sci
 
 ## Copyright and publication notice
 
-The software source code is available under the [MIT License for Software Source Code](https://github.com/Planetarian39/manga-dm/blob/main/LICENSE). The repository and website's original research content, including prose, figures, tables, visual assets, unpublished analysis results, scientific interpretations, conclusions, derived data products, and manuscript materials, is governed by the [Research Content License](https://github.com/Planetarian39/manga-dm/blob/main/LICENSE-CONTENT.md).
+The software source code is available under the [MIT License for Software Source Code](https://github.com/Planetarian39/manga-dm/blob/main/LICENSE). The repository and website's original research content, including prose, figures, tables, visual assets, unpublished analysis results, scientific interpretations, conclusions, derived data products, and manuscript materials, is governed by the [Research Content License](/research-content-license).
 
 Readers may study the material, use the underlying methods and separately licensed software, and cite this project in scholarly discussion. Without prior written permission from the copyright holder, the original research content, results, conclusions, figures, tables, and derived data products may not be copied, adapted, submitted, or published as part of another work.
 

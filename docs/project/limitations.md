@@ -9,7 +9,7 @@ description: Scientific scope, assumptions, and interpretation boundaries.
 
 ## Selection conditioning
 
-The empirical screen favors velocity fields with ordered disk-like rotation, adequate radial coverage, stable sampling, and predictive agreement. The population model is conditional on passing those gates and should not be generalized to all MaNGA galaxies or all dark-matter halos without an explicit selection model. No aggregate selection counts are needed to state this boundary.
+The empirical screen favors velocity fields with ordered disk-like rotation, adequate radial coverage, stable sampling, and predictive agreement. The population model is conditional on passing those gates and should not be generalized to all MaNGA galaxies or all dark-matter halos without an explicit selection model. The published sample-size milestones describe pipeline scope, not representativeness or scientific findings.
 
 ## Limited radial leverage
 

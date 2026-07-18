@@ -202,7 +202,7 @@ export default defineConfig({
     },
     footer: {
       message: 'A computational astrophysics research project by Hongyi Xu, Department of Physics, University of Toronto.',
-      copyright: 'Methods, software, and allowlisted case artifacts are public; unpublished aggregate findings are intentionally excluded.',
+      copyright: 'Sample-size milestones, methods, software, and allowlisted case artifacts are public; aggregate scientific findings remain unpublished.',
     },
   },
 })
