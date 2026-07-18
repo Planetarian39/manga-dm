@@ -8,6 +8,7 @@
   "requiredPages": [
     "index.md",
     "about/index.md",
+    "paper-preview/index.md",
     "overview/project-overview.md",
     "methods/index.md",
     "methods/data-and-selection.md",
@@ -65,6 +66,20 @@
     "assets/home/manga-telescope.png",
     "assets/home/manga-telescope.webp",
     "assets/home/manga-telescope-mobile.webp",
-    "assets/home/milky-way-anatomy.jpg"
+    "assets/home/milky-way-anatomy.jpg",
+    "assets/manuscript-preview/manuscript-page-01.webp",
+    "assets/manuscript-preview/manuscript-page-02.webp",
+    "assets/manuscript-preview/manuscript-page-03.webp",
+    "assets/manuscript-preview/manuscript-page-04.webp",
+    "assets/manuscript-preview/manuscript-page-05.webp",
+    "assets/manuscript-preview/manuscript-page-06.webp",
+    "assets/manuscript-preview/manuscript-page-07.webp",
+    "assets/manuscript-preview/manuscript-page-08.webp",
+    "assets/manuscript-preview/manuscript-page-09.webp",
+    "assets/manuscript-preview/manuscript-page-10.webp",
+    "assets/manuscript-preview/manuscript-page-11.webp",
+    "assets/manuscript-preview/manuscript-page-12.webp",
+    "assets/manuscript-preview/manuscript-page-13.webp",
+    "assets/manuscript-preview/manuscript-page-14.webp"
   ]
 }

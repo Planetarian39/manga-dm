@@ -24,7 +24,7 @@ features:
   - title: Evidence of rigor
     details: Four reviewable galaxy cases, complete posterior artifacts, explicit provenance, convergence diagnostics, known limitations, and automated documentation checks.
   - title: Galaxy sample
-    details: 8,070 (inclination-selected); 1,234 (empirically screened); 620 (final population-fit).
+    details: 8,070 (inclination-selected)<br>1,234 (empirically screened)<br>620 (final population-fit)
 ---
 
 <ApplicationHome />

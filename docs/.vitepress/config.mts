@@ -39,25 +39,57 @@ export default defineConfig({
     siteTitle: 'MaNGA / Dark Matter',
     nav: [
       { text: 'Overview', link: '/' },
+      { text: 'Manuscript Preview', link: '/paper-preview/' },
       {
         text: 'Research',
         items: [
-          { text: 'Two-minute overview', link: '/overview/project-overview.html' },
-          { text: 'Scientific methods', link: '/methods/' },
-          { text: 'Diagnostics and quality', link: '/methods/diagnostics-and-quality-gates.html' },
-          { text: 'Limitations', link: '/project/limitations.html' },
+          {
+            text: 'Start here',
+            items: [
+              { text: 'Two-minute overview', link: '/overview/project-overview.html' },
+              { text: 'Scientific methods', link: '/methods/' },
+            ],
+          },
+          {
+            text: 'Evidence and interpretation',
+            items: [
+              { text: 'Worked example: 11743-9102', link: '/case-studies/11743-9102.html' },
+              { text: 'Diagnostics and quality', link: '/methods/diagnostics-and-quality-gates.html' },
+              { text: 'Limitations', link: '/project/limitations.html' },
+            ],
+          },
+          {
+            text: 'Background',
+            items: [
+              { text: 'MCMC and Bayesian inference', link: '/background/mcmc/' },
+            ],
+          },
         ],
       },
-      { text: 'Worked Example', link: '/case-studies/11743-9102.html' },
       {
         text: 'Reproducibility',
         items: [
-          { text: 'Run the pipeline', link: '/run/' },
-          { text: 'Architecture', link: '/project/architecture.html' },
-          { text: 'Implementation status', link: '/project/implementation-status.html' },
-          { text: 'Downloads and provenance', link: '/case-studies/downloads.html' },
-          { text: 'Application snapshot', link: '/project/application-snapshot.html' },
-          { text: 'MCMC appendix', link: '/background/mcmc/' },
+          {
+            text: 'Run and inspect',
+            items: [
+              { text: 'Run the pipeline', link: '/run/' },
+              { text: 'Downloads and provenance', link: '/case-studies/downloads.html' },
+            ],
+          },
+          {
+            text: 'Implementation',
+            items: [
+              { text: 'Architecture', link: '/project/architecture.html' },
+              { text: 'Method-to-code map', link: '/project/code-map.html' },
+              { text: 'Implementation status', link: '/project/implementation-status.html' },
+            ],
+          },
+          {
+            text: 'Release record',
+            items: [
+              { text: 'Application snapshot', link: '/project/application-snapshot.html' },
+            ],
+          },
         ],
       },
       { text: 'About', link: '/about/' },

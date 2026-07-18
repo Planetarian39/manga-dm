@@ -247,6 +247,8 @@ test('mobile home hero reserves space below the fixed navigation for its eyebrow
 
 test('application homepage leads with researcher identity and review paths', () => {
   const homepage = readFileSync(join(repositoryRoot, 'docs', 'index.md'), 'utf8')
+  const manuscriptPreview = readFileSync(join(repositoryRoot, 'docs', '.vitepress', 'theme', 'components', 'ManuscriptPreview.vue'), 'utf8')
+  const themeLayout = readFileSync(join(repositoryRoot, 'docs', '.vitepress', 'theme', 'Layout.vue'), 'utf8')
   assert.match(homepage, /Inferring dark-matter halos/)
   assert.match(homepage, /Hongyi Xu/)
   assert.match(homepage, /Department of Physics/)
@@ -258,7 +260,34 @@ test('application homepage leads with researcher identity and review paths', () 
   assert.match(homepage, /1,234/)
   assert.match(homepage, /620 \(final population-fit\)/)
   assert.match(homepage, /<ApplicationHome\s*\/>/)
+  assert.match(themeLayout, /#home-features-before/)
+  assert.match(themeLayout, /<ManuscriptPreview v-if="frontmatter\.layout === 'home'"\s*\/>/)
+  assert.match(manuscriptPreview, /Manuscript preview · draft/)
+  assert.match(manuscriptPreview, /manuscript-page-01\.webp/)
+  assert.match(manuscriptPreview, /manuscript-page-04\.webp/)
+  assert.match(manuscriptPreview, /manuscript-page-06\.webp/)
+  assert.match(manuscriptPreview, /Open manuscript preview/)
   assert.doesNotMatch(homepage, /Image credits\s*\n\s*link:/)
+})
+
+test('manuscript previews remain licensed and allowlisted', () => {
+  const preview = readFileSync(join(repositoryRoot, 'docs', 'paper-preview', 'index.md'), 'utf8')
+  const gallery = readFileSync(join(repositoryRoot, 'docs', '.vitepress', 'theme', 'components', 'ManuscriptPreviewGallery.vue'), 'utf8')
+  const policy = readFileSync(join(repositoryRoot, 'docs', 'public-boundary.json'), 'utf8')
+
+  assert.match(preview, /Draft · manuscript in preparation/)
+  assert.match(preview, /Research Content License/)
+  assert.match(preview, /may not be copied, adapted, submitted, or published/)
+  assert.match(preview, /All 14 pages are shown below/)
+  assert.match(preview, /Page 1 is retained as a complete preview/)
+  assert.match(preview, /<ManuscriptPreviewGallery\s*\/>/)
+  assert.match(gallery, /manuscript-page-\$\{number\}\.webp/)
+  for (const page of Array.from({ length: 14 }, (_, index) => String(index + 1).padStart(2, '0'))) {
+    assert.match(policy, new RegExp(`assets/manuscript-preview/manuscript-page-${page}\\.webp`))
+  }
+  assert.match(gallery, /remainder is irreversibly blurred/)
+  assert.match(gallery, /number === '01'/)
+  assert.doesNotMatch(gallery, /<figcaption>/)
 })
 
 test('licensing separates MIT software from protected research content', () => {
@@ -289,14 +318,35 @@ test('researcher metadata is consistent across package and citation records', ()
   assert.match(about, /University of Toronto/)
 })
 
-test('navigation exposes application-oriented routes and canonical production URLs', () => {
+test('navigation follows the research-to-reproducibility reading path', () => {
   const config = readFileSync(join(repositoryRoot, 'docs', '.vitepress', 'config.mts'), 'utf8')
+  const navStart = config.indexOf('nav: [')
+  const navEnd = config.indexOf('\n    sidebar:', navStart)
+  const nav = config.slice(navStart, navEnd)
+
   assert.match(config, /canonicalRoot = 'https:\/\/planetarian39\.github\.io\/manga-dm\/'/)
-  assert.match(config, /text: 'Research'/)
-  assert.match(config, /text: 'Worked Example'/)
-  assert.match(config, /text: 'Reproducibility'/)
-  assert.match(config, /text: 'About'/)
-  assert.match(config, /link: '\/about\/'/)
+  assert.notEqual(navStart, -1)
+  assert.notEqual(navEnd, -1)
+
+  const topLevelItems = [
+    "{ text: 'Overview', link: '/' }",
+    "{ text: 'Manuscript Preview', link: '/paper-preview/' }",
+    "text: 'Research'",
+    "text: 'Reproducibility'",
+    "{ text: 'About', link: '/about/' }",
+  ]
+  const topLevelPositions = topLevelItems.map((item) => nav.indexOf(item))
+  assert.ok(topLevelPositions.every((position) => position >= 0))
+  assert.deepEqual([...topLevelPositions].sort((left, right) => left - right), topLevelPositions)
+
+  assert.match(nav, /text: 'Start here'[\s\S]*text: 'Two-minute overview'[\s\S]*text: 'Scientific methods'/)
+  assert.match(nav, /text: 'Evidence and interpretation'[\s\S]*text: 'Worked example: 11743-9102'[\s\S]*text: 'Diagnostics and quality'[\s\S]*text: 'Limitations'/)
+  assert.match(nav, /text: 'Background'[\s\S]*text: 'MCMC and Bayesian inference'/)
+  assert.match(nav, /text: 'Run and inspect'[\s\S]*text: 'Run the pipeline'[\s\S]*text: 'Downloads and provenance'/)
+  assert.match(nav, /text: 'Implementation'[\s\S]*text: 'Architecture'[\s\S]*text: 'Method-to-code map'[\s\S]*text: 'Implementation status'/)
+  assert.match(nav, /text: 'Release record'[\s\S]*text: 'Application snapshot'/)
+  assert.doesNotMatch(nav, /text: 'Worked Example'/)
+  assert.doesNotMatch(nav, /text: 'MCMC appendix'/)
 })
 
 test('public posterior downloads are not ignored by Git', () => {

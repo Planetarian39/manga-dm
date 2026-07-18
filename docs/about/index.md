@@ -33,15 +33,15 @@ The public evidence for this work includes:
 
 The project accompanies a **first-author manuscript in preparation for arXiv and subsequent journal submission**. The site deliberately separates the manuscript method from current CLI fallbacks and does not publish aggregate findings or conclusions from the manuscript.
 
+## Research interests
+
+Computational physics · Bayesian inference · uncertainty quantification · scientific machine learning · dark matter and galaxy dynamics · machine learning for physics · jet physics · reproducible scientific computing
+
 ## Copyright and publication notice
 
 The software source code is available under the [MIT License for Software Source Code](https://github.com/Planetarian39/manga-dm/blob/main/LICENSE). The repository and website's original research content, including prose, figures, tables, visual assets, unpublished analysis results, scientific interpretations, conclusions, derived data products, and manuscript materials, is governed by the [Research Content License](https://github.com/Planetarian39/manga-dm/blob/main/LICENSE-CONTENT.md).
 
 Readers may study the material, use the underlying methods and separately licensed software, and cite this project in scholarly discussion. Without prior written permission from the copyright holder, the original research content, results, conclusions, figures, tables, and derived data products may not be copied, adapted, submitted, or published as part of another work.
-
-## Research interests
-
-Computational physics · Bayesian inference · uncertainty quantification · scientific machine learning · dark matter and galaxy dynamics · machine learning for physics · jet physics · reproducible scientific computing
 
 ## Links
 

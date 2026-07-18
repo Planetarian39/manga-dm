@@ -15,6 +15,7 @@ const contributions = [
   ['Uncertainty', 'Retained correlated posterior samples instead of reducing each galaxy to a point estimate.'],
   ['Validation', 'Documented convergence, posterior geometry, predictive checks, and known implementation differences.'],
 ]
+
 </script>
 
 <template>
