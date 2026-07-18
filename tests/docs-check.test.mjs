@@ -297,6 +297,13 @@ test('wrapped manuscript preview heading keeps readable line spacing', () => {
   assert.match(headingRules, /line-height:\s*1\.12;/)
 })
 
+test('manuscript preview gallery displays one page per row', () => {
+  const styles = readFileSync(join(repositoryRoot, 'docs', '.vitepress', 'theme', 'style.css'), 'utf8')
+  const galleryRules = styles.match(/\.manuscript-page-gallery\s*\{([\s\S]*?)\n\}/)?.[1] ?? ''
+
+  assert.match(galleryRules, /grid-template-columns:\s*1fr;/)
+})
+
 test('licensing separates MIT software from protected research content', () => {
   const readme = readFileSync(join(repositoryRoot, 'README.md'), 'utf8')
   const about = readFileSync(join(repositoryRoot, 'docs', 'about', 'index.md'), 'utf8')

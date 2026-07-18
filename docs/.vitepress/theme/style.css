@@ -540,7 +540,7 @@ h3,
 
 .manuscript-page-gallery {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 32px;
   margin: 2rem 0 4rem;
 }
