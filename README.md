@@ -82,4 +82,17 @@ GitHub Pages deployment uses `.github/workflows/deploy-docs.yml` and the officia
 
 ## License
 
-See [LICENSE](LICENSE).
+The software source code is available under the [MIT License for Software
+Source Code](LICENSE). This applies to the Python package, scripts, tests, and
+configuration needed to run, build, test, or package the software.
+
+The repository and website's original research content, including prose,
+figures, tables, visual assets, unpublished analysis results, scientific
+interpretations, conclusions, derived data products, and manuscript materials,
+is governed by the [Research Content License](LICENSE-CONTENT.md). It may be
+read, studied, and cited, but may not be copied, adapted, submitted, or
+published as part of another work without prior written permission from the
+copyright holder.
+
+The package metadata and `CITATION.cff` record `MIT` as the license for the
+software package only.

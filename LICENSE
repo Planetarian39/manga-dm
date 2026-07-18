@@ -1,6 +1,14 @@
-MIT License
+MIT License for Software Source Code
 
-Copyright (c) 2026 manga-dm
+Copyright (c) 2026 Hongyi Xu
+
+This MIT License applies only to the software source code and files directly
+needed to run, build, test, or package it, including the Python package,
+scripts, tests, and configuration files. It does not apply to the original
+research content, website prose, figures, tables, visual assets, unpublished
+analysis results, scientific interpretations, conclusions, derived data
+products, or manuscript materials. Those materials are governed by
+LICENSE-CONTENT.md.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
