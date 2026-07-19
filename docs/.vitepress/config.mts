@@ -39,7 +39,7 @@ export default defineConfig({
     siteTitle: 'MaNGA / Dark Matter',
     nav: [
       { text: 'Overview', link: '/' },
-      { text: 'Manuscript Preview', link: '/paper-preview/' },
+      { text: 'Research Paper', link: '/paper-preview/' },
       {
         text: 'Research',
         items: [

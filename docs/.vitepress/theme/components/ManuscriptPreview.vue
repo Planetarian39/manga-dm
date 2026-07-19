@@ -24,8 +24,8 @@ const manuscriptPages = [
   <section class="manuscript-preview" aria-labelledby="manuscript-preview-title">
     <div class="manuscript-preview__heading">
       <div>
-        <p class="section-kicker">Manuscript preview · draft</p>
-        <h2 id="manuscript-preview-title">A concise view of the research manuscript</h2>
+        <p class="section-kicker">Research paper · draft</p>
+        <h2 id="manuscript-preview-title">A concise preview of the research paper</h2>
       </div>
       <p class="manuscript-preview__notice">
         Protected research content. Read and cite with attribution; do not reproduce, adapt, submit, or publish it
@@ -35,12 +35,12 @@ const manuscriptPages = [
     </div>
     <div class="manuscript-preview__grid">
       <figure v-for="item in manuscriptPages" :key="item.page" class="manuscript-preview__card">
-        <a :href="withBase('/paper-preview/')" :aria-label="`Open manuscript preview: page ${item.page}`">
-          <img :src="withBase(item.src)" :alt="`Draft manuscript page ${item.page}: ${item.title}.`" loading="lazy">
+        <a :href="withBase('/paper-preview/')" :aria-label="`Open research paper preview: page ${item.page}`">
+          <img :src="withBase(item.src)" :alt="`Draft research paper page ${item.page}: ${item.title}.`" loading="lazy">
         </a>
         <figcaption><span>Page {{ item.page }}</span>{{ item.title }} · © 2026 Hongyi Xu</figcaption>
       </figure>
     </div>
-    <a class="home-button home-button--brand" :href="withBase('/paper-preview/')">Open manuscript preview</a>
+    <a class="home-button home-button--brand" :href="withBase('/paper-preview/')">Open research paper</a>
   </section>
 </template>

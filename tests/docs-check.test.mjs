@@ -272,11 +272,11 @@ test('application homepage leads with researcher identity and review paths', () 
   assert.match(applicationHome, /Review implementation status/)
   assert.match(themeLayout, /#home-features-before/)
   assert.match(themeLayout, /<ManuscriptPreview v-if="frontmatter\.layout === 'home'"\s*\/>/)
-  assert.match(manuscriptPreview, /Manuscript preview · draft/)
+  assert.match(manuscriptPreview, /Research paper · draft/)
   assert.match(manuscriptPreview, /manuscript-page-01\.webp/)
   assert.match(manuscriptPreview, /manuscript-page-04\.webp/)
   assert.match(manuscriptPreview, /manuscript-page-06\.webp/)
-  assert.match(manuscriptPreview, /Open manuscript preview/)
+  assert.match(manuscriptPreview, /Open research paper/)
   assert.doesNotMatch(homepage, /Image credits\s*\n\s*link:/)
 })
 
@@ -285,7 +285,7 @@ test('manuscript previews remain licensed and allowlisted', () => {
   const gallery = readFileSync(join(repositoryRoot, 'docs', '.vitepress', 'theme', 'components', 'ManuscriptPreviewGallery.vue'), 'utf8')
   const policy = readFileSync(join(repositoryRoot, 'docs', 'public-boundary.json'), 'utf8')
 
-  assert.match(preview, /Draft · manuscript in preparation/)
+  assert.match(preview, /Draft · research paper in preparation/)
   assert.match(preview, /Research Content License/)
   assert.match(preview, /may not be copied, adapted, submitted, or published/)
   assert.match(preview, /All 14 pages are shown below/)
@@ -382,7 +382,7 @@ test('navigation follows the research-to-reproducibility reading path', () => {
 
   const topLevelItems = [
     "{ text: 'Overview', link: '/' }",
-    "{ text: 'Manuscript Preview', link: '/paper-preview/' }",
+    "{ text: 'Research Paper', link: '/paper-preview/' }",
     "text: 'Research'",
     "text: 'Reproducibility'",
     "{ text: 'About', link: '/about/' }",
