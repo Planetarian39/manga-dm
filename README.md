@@ -1,17 +1,19 @@
 # MaNGA Dark Matter
 
+[MaNGA Dark Matter Project Website](https://hyi03.github.io/manga-dm/)
+
 `manga-dm` is a Python research pipeline for MaNGA gas-kinematic screening, empirical rotation curves, single-galaxy NFW inference, posterior-sample management, and population-model diagnostics. The public interface is the `manga` CLI; scientific modules live under `src/`.
 
 Developed by **Hongyi Xu**, an undergraduate student in the Department of Physics at the University of Toronto. The project accompanies a first-author manuscript in preparation for arXiv and subsequent journal submission. The public repository documents three sample-size milestones, methods, software, and allowlisted single-galaxy artifacts without releasing aggregate scientific findings.
 
 ## Documentation
 
-- [Documentation home](https://planetarian39.github.io/manga-dm/)
-- [Quick start](https://planetarian39.github.io/manga-dm/run/cli-workflow.html)
-- [Method overview](https://planetarian39.github.io/manga-dm/methods/)
-- [11743-9102 case study](https://planetarian39.github.io/manga-dm/case-studies/11743-9102.html)
-- [About the researcher](https://planetarian39.github.io/manga-dm/about/)
-- [Application snapshot](https://planetarian39.github.io/manga-dm/project/application-snapshot.html)
+- [Documentation home](https://hyi03.github.io/manga-dm/)
+- [Quick start](https://hyi03.github.io/manga-dm/run/cli-workflow.html)
+- [Method overview](https://hyi03.github.io/manga-dm/methods/)
+- [11743-9102 case study](https://hyi03.github.io/manga-dm/case-studies/11743-9102.html)
+- [About the researcher](https://hyi03.github.io/manga-dm/about/)
+- [Application snapshot](https://hyi03.github.io/manga-dm/project/application-snapshot.html)
 
 The site presents sample-size milestones, methods, implementation status, MCMC background, and four allowlisted single-galaxy examples. Aggregate posterior findings, discussion, conclusions, paper sources, and full-sample products are intentionally excluded.
 
@@ -37,7 +39,7 @@ conda install -c conda-forge numpy scipy pandas xarray matplotlib astropy pymc a
 pip install -e .
 ```
 
-See the [installation guide](https://planetarian39.github.io/manga-dm/run/installation.html) for environment notes and troubleshooting.
+See the [installation guide](https://hyi03.github.io/manga-dm/run/installation.html) for environment notes and troubleshooting.
 
 ## Quick start
 
@@ -53,7 +55,7 @@ manga stage2 --diagnose --quality-cut recommended
 The equivalent module entry point is `python -m src`.
 
 > [!IMPORTANT]
-> Current fallback thresholds and the default Stage 2 path are not a versioned manuscript-aligned profile. See the [implementation-status page](https://planetarian39.github.io/manga-dm/project/implementation-status.html) before making reproducibility claims.
+> Current fallback thresholds and the default Stage 2 path are not a versioned manuscript-aligned profile. See the [implementation-status page](https://hyi03.github.io/manga-dm/project/implementation-status.html) before making reproducibility claims.
 
 ## Repository layout
 

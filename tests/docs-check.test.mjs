@@ -335,7 +335,7 @@ test('licensing separates MIT software from protected research content', () => {
   assert.match(about, /\[Research Content License\]\(\/research-content-license\)/)
   assert.match(manuscriptPreview, /\[Research Content License\]\(\/research-content-license\)/)
   assert.match(homePreview, /withBase\('\/research-content-license\.html'\)/)
-  assert.doesNotMatch(`${about}\n${manuscriptPreview}\n${homePreview}`, /github\.com\/Planetarian39\/manga-dm\/blob\/main\/LICENSE-CONTENT\.md/)
+  assert.doesNotMatch(`${about}\n${manuscriptPreview}\n${homePreview}`, /github\.com\/hyi03\/manga-dm\/blob\/main\/LICENSE-CONTENT\.md/)
 })
 
 test('deep case keeps the identifier together and limits the page outline to H2', () => {
@@ -376,7 +376,7 @@ test('navigation follows the research-to-reproducibility reading path', () => {
   const navEnd = config.indexOf('\n    sidebar:', navStart)
   const nav = config.slice(navStart, navEnd)
 
-  assert.match(config, /canonicalRoot = 'https:\/\/planetarian39\.github\.io\/manga-dm\/'/)
+  assert.match(config, /canonicalRoot = 'https:\/\/hyi03\.github\.io\/manga-dm\/'/)
   assert.notEqual(navStart, -1)
   assert.notEqual(navEnd, -1)
 

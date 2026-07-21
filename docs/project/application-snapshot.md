@@ -15,8 +15,8 @@ This page defines the public graduate-application candidate for `manga-dm`.
 | Snapshot date | 2026-07-17 |
 | Source revision | Pending final application commit; working-tree base `859d5d5` |
 | Status | Application candidate; research software remains Alpha |
-| Official site | `https://planetarian39.github.io/manga-dm/` |
-| Repository | `https://github.com/Planetarian39/manga-dm` |
+| Official site | `https://hyi03.github.io/manga-dm/` |
+| Repository | `https://github.com/hyi03/manga-dm` |
 
 ## Included public evidence
 

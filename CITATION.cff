@@ -6,8 +6,8 @@ authors:
   - family-names: Xu
     given-names: Hongyi
     affiliation: "Department of Physics, University of Toronto, Toronto, Ontario, Canada"
-repository-code: "https://github.com/Planetarian39/manga-dm"
-url: "https://planetarian39.github.io/manga-dm/"
+repository-code: "https://github.com/hyi03/manga-dm"
+url: "https://hyi03.github.io/manga-dm/"
 version: 0.1.0
 license: MIT
 keywords:

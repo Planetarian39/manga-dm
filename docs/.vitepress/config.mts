@@ -1,7 +1,7 @@
 import { defineConfig } from 'vitepress'
 
-const repository = 'https://github.com/Planetarian39/manga-dm'
-const canonicalRoot = 'https://planetarian39.github.io/manga-dm/'
+const repository = 'https://github.com/hyi03/manga-dm'
+const canonicalRoot = 'https://hyi03.github.io/manga-dm/'
 
 export default defineConfig({
   title: 'MaNGA Dark Matter',

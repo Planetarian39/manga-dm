@@ -39,12 +39,12 @@ Computational physics · Bayesian inference · uncertainty quantification · sci
 
 ## Copyright and publication notice
 
-The software source code is available under the [MIT License for Software Source Code](https://github.com/Planetarian39/manga-dm/blob/main/LICENSE). The repository and website's original research content, including prose, figures, tables, visual assets, unpublished analysis results, scientific interpretations, conclusions, derived data products, and manuscript materials, is governed by the [Research Content License](/research-content-license).
+The software source code is available under the [MIT License for Software Source Code](https://github.com/hyi03/manga-dm/blob/main/LICENSE). The repository and website's original research content, including prose, figures, tables, visual assets, unpublished analysis results, scientific interpretations, conclusions, derived data products, and manuscript materials, is governed by the [Research Content License](/research-content-license).
 
 Readers may study the material, use the underlying methods and separately licensed software, and cite this project in scholarly discussion. Without prior written permission from the copyright holder, the original research content, results, conclusions, figures, tables, and derived data products may not be copied, adapted, submitted, or published as part of another work.
 
 ## Links
 
-- [GitHub: Planetarian39](https://github.com/Planetarian39)
-- [Project repository](https://github.com/Planetarian39/manga-dm)
+- [GitHub: hyi03](https://github.com/hyi03)
+- [Project repository](https://github.com/hyi03/manga-dm)
 - [Application snapshot](/project/application-snapshot)
